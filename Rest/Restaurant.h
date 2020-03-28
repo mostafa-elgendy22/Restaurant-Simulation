@@ -1,6 +1,6 @@
 #ifndef __RESTAURANT_H_
 #define __RESTAURANT_H_
-
+//this is a test
 #include "..\Defs.h"
 #include "..\CMUgraphicsLib\CMUgraphics.h"
 #include "..\GUI\GUI.h"
@@ -18,7 +18,7 @@ private:
 	Queue<Event*> EventsQueue;	//Queue of all events that will be loaded from file
 
 
-	/// ==> 
+	/// ==>
 	//	DEMO-related members. Should be removed in phases 1&2
 	Queue<Order*> DEMO_Queue;	//Important: This is just for demo
 	/// ==>
@@ -38,7 +38,7 @@ private:
 	int VeganCooks;         //number of vegan cooks
 	int VeganSpeed;         //speed of vegan cooks
 	int VeganBreak;         //break duration of vegan cooks
-	
+
 	int VipCooks;           //number of vip cooks
 	int VipSpeed;           //speed of vip cooks
 	int VipBreak;           //break duration of vip cooks
@@ -76,12 +76,12 @@ public:
 
 
 
-	/// ===================    DEMO-related functions. Should be removed in phases 1&2   ================= 
+	/// ===================    DEMO-related functions. Should be removed in phases 1&2   =================
 
 	void Just_A_Demo();	//just to show a demo and should be removed in phase1 1 & 2
 	void AddtoDemoQueue(Order* po);	//adds an order to the demo queue
 
-/// ================================================================================================== 
+/// ==================================================================================================
 
 
 
