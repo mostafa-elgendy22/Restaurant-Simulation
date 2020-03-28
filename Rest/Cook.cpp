@@ -3,6 +3,7 @@
 
 Cook::Cook()
 {
+
 }
 
 
@@ -31,6 +32,5 @@ void Cook::setID(int id)
 void Cook::setType(ORD_TYPE t)
 {
 	type = t;
+	return;
 }
-
-
