@@ -3,10 +3,10 @@
 #include <iostream>
 #include <fstream>
 using namespace std;
-////////
+
 #include "Restaurant.h"
 #include "..\Events\ArrivalEvent.h"
-
+//
 
 Restaurant::Restaurant()
 {
