@@ -5,55 +5,56 @@
 #include"Generic_DS/Queue.h"
 
 template<typename T>
-class PriorityQueue
+class priorityqueue
 {
 private:
 
 	Node<T>* backPtr;
 
 public:
-	PriorityQueue();
+	priorityqueue();
 	bool isEmpty() const;
 	virtual bool enqueue(const T& newEntry);
 	bool dequeue(T& frntEntry);
 	bool peekFront(T& frntEntry)  const;
 	//T* toArray(int& count);	//returns array of T (array if items)
-	~PriorityQueue();
+	~priorityqueue();
+	T* toArray(int&);
 
 
 };
 
 template<typename T>
-PriorityQueue<T>::PriorityQueue()
+priorityqueue<T>::priorityqueue()
 {
 	backPtr = nullptr;
 }
 
 template<typename T>
-bool PriorityQueue<T>::isEmpty() const
+bool priorityqueue<T>::isEmpty() const
 {
 	return backPtr == nullptr;
 }
 
 template<typename T>
-bool PriorityQueue<T>::enqueue(const T& newEntry)
+bool priorityqueue<T>::enqueue(const T& newEntry)
 {
 	Node<T>* newnode = new Node<T>(newEntry);
 
-	if (backPtr == nullptr)
+	if(backPtr==nullptr)
 	{
 		backPtr = newnode;
 		backPtr->setNext(newnode);
 		return true;
 	}
-
-
+	
+	
 	Node<T>* prev = backPtr;
 	Node<T>* ptr = backPtr->getNext();
 
 	while (ptr != backPtr)
 	{
-		if ((newnode->getItem()) > (ptr->getItem()))
+		if (*(newnode->getItem()) >*(ptr->getItem()))
 		{
 			prev->setNext(newnode);
 			newnode->setNext(ptr);
@@ -63,19 +64,20 @@ bool PriorityQueue<T>::enqueue(const T& newEntry)
 		ptr = ptr->getNext();
 	}
 
-	if ((newnode->getItem()) >  (backPtr->getItem()))
+	if (*(newnode->getItem())> *(backPtr->getItem()))
 	{
 		prev->setNext(newnode);
 		newnode->setNext(backPtr);
 	}
 	else
 	{
-
+			
 		newnode->setNext(backPtr->getNext());
 		backPtr->setNext(newnode);
+		backPtr = newnode;
 	}
 
-
+	
 	return true;
 
 
@@ -83,7 +85,7 @@ bool PriorityQueue<T>::enqueue(const T& newEntry)
 
 
 template<typename T>
-bool PriorityQueue<T>::dequeue(T& frntEntry)
+bool priorityqueue<T>::dequeue(T& frntEntry)
 {
 	if (isEmpty())return false;
 
@@ -101,7 +103,7 @@ bool PriorityQueue<T>::dequeue(T& frntEntry)
 }
 
 template<typename T>
-bool PriorityQueue<T>::peekFront(T& frntEntry)  const
+bool priorityqueue<T>::peekFront(T& frntEntry)  const
 {
 	if (isEmpty())
 		return false;
@@ -113,7 +115,35 @@ bool PriorityQueue<T>::peekFront(T& frntEntry)  const
 
 
 template<typename T>
-PriorityQueue<T>::~PriorityQueue()
+priorityqueue<T>::~priorityqueue()
 {
+	
+}
 
+
+template <typename T>
+T* priorityqueue<T>::toArray(int& count)
+{
+	count = 0;
+
+	if (!backPtr)
+		return nullptr;
+	//counting the no. of items in the Queue
+	Node<T>* p = backPtr->getNext();
+	Node<T>* e = p;
+	do
+	{
+		count++;
+		p = p->getNext();
+	}while ((p != e));
+
+
+	T* Arr = new T[count];
+	p = backPtr->getNext();
+	for (int i = 0; i < count; i++)
+	{
+		Arr[i] = p->getItem();
+		p = p->getNext();
+	}
+	return Arr;
 }
