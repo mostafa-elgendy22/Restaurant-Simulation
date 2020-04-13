@@ -8,6 +8,8 @@
 
 #include <fstream>
 
+#include"..\promote.h"
+
 using namespace std;
 
 
@@ -15,10 +17,8 @@ using namespace std;
 #include "Restaurant.h"
 
 #include "..\Events\ArrivalEvent.h"
-
-#include"..\CancellationEvent.h"
-
-#include"..\PromotionEvent.h"
+ 
+#include"..\cancel.h"
 
 
 
@@ -26,16 +26,14 @@ using namespace std;
 Restaurant::Restaurant()
 
 {
-
 	pGUI = NULL;
-
 }
 
 
 
 void Restaurant::RunSimulation()
-{
 
+{
 	pGUI = new GUI;
 
 	PROG_MODE	mode = pGUI->getGUIMode();
@@ -60,7 +58,7 @@ void Restaurant::RunSimulation()
 
 	case MODE_DEMO:
 		Just_A_Demo();
-
+		
 
 
 	};
@@ -82,6 +80,7 @@ void Restaurant::RunSimulation()
 //Executes ALL events that should take place at current timestep
 
 void Restaurant::ExecuteEvents(int CurrentTimeStep)
+
 {
 
 	Event* pE;
@@ -108,6 +107,7 @@ void Restaurant::ExecuteEvents(int CurrentTimeStep)
 }
 
 Restaurant::~Restaurant()
+
 {
 
 	if (pGUI)
@@ -122,21 +122,25 @@ void Restaurant::simulate()
 	int ordernum = 0;
 	ReadFile();
 	while (!inservice.isempty() || !normalorders.isempty()
-		|| !viporders.isEmpty() || !veganorders.isEmpty())
+		|| !viporders.isEmpty() || !veganorders.isEmpty()||
+		!EventsQueue.isEmpty())
 	{
 		timestep++;
 		ExecuteEvents(timestep);
 		Order* ptr;
 		if (normalorders.dequeue(ptr))
 		{
+			ptr->setStatus(SRV);
 			inservice.InsertEnd(ptr);
 		}
 		if (viporders.dequeue(ptr))
 		{
+			ptr->setStatus(SRV);
 			inservice.InsertEnd(ptr);
 		}
 		if (veganorders.dequeue(ptr))
 		{
+			ptr->setStatus(SRV);
 			inservice.InsertEnd(ptr);
 		}
 		if (timestep % 5 == 0)
@@ -146,6 +150,7 @@ void Restaurant::simulate()
 			{
 				if (!inservice.dequeue(ptr))
 					break;
+				ptr->setStatus(DONE);
 				finished.InsertEnd(ptr);
 			}
 		}
@@ -168,31 +173,82 @@ void Restaurant::FillDrawingList(int CurrentTimeStep)
 
 	//To add Cooks it should call function  void GUI::AddToDrawingList(Cook* pCc);
 
-	char timestep[10];
+	pGUI->ResetDrawingList();
 
-	itoa(CurrentTimeStep, timestep, 10);
+	string timestep;
 
-	pGUI->PrintMessage(timestep);
+	timestep += to_string(CurrentTimeStep);
+
+	
 
 	//pGUI->PrintMessage(" ")
-
+	
 	int orders;
 	Order** ord = finished.toArray(orders);
+	for(int i=0;i<orders;i++)
+	{
+		pGUI->AddToDrawingList(ord[i]);
+	}
 
+	ord = inservice.toArray(orders);
+	int inser = orders;
+	for (int i = 0; i < orders; i++)
+	{
+		pGUI->AddToDrawingList(ord[i]);
+	}
+
+	ord = normalorders.toArray(orders);
+	int normnum = orders;
+	for (int i = 0; i < orders; i++)
+	{
+		pGUI->AddToDrawingList(ord[i]);
+	}
+
+	ord = veganorders.toArray(orders);
+	int vegannum = orders;
 	for (int i = 0; i < orders; orders++)
+	{
+		pGUI->AddToDrawingList(ord[i]);
+	}
+	
+	ord = viporders.toArray(orders);
+	int vipnum = orders;
+	for (int i = 0; i < orders; i++)
 	{
 		pGUI->AddToDrawingList(ord[i]);
 	}
 
 	int cooks;
-	Cook** co = cooklist.toArray(cooks);
-
-	for (int i = 0; i < cooks; i++)
+	Cook**co=normalcooks.toArray(cooks);
+	int normcnum = cooks-inser/3;
+	for (int i = 0; i < normcnum; i++)
 	{
 		pGUI->AddToDrawingList(co[i]);
 	}
 
-	Sleep(100);
+	co = vegancooks.toArray(cooks);
+	int vegancnum = cooks-(inser-(inser/3))/2;
+	for (int i = 0; i < vegancnum ; i++)
+	{
+		pGUI->AddToDrawingList(co[i]);
+	}
+
+	 co = vipcooks.toArray(cooks);
+	int vipcnum = cooks-inser- (inser - (inser / 3)) / 2;
+	for (int i = 0; i < vipcnum; i++)
+	{
+		pGUI->AddToDrawingList(co[i]);
+	}
+
+	if (vegancnum < 0)vegancnum = 0;
+	if (vipcnum < 0)vipcnum = 0;
+	if (normcnum < 0)normcnum = 0;
+
+	pGUI->PrintMessage("TS : " + timestep+"   NRMWOrders: "+to_string(normnum)+
+		 "	 VGNWOrders: "+to_string(vegannum)+"   VIPWOrders: "+to_string(vipnum)+"   NRMCooks: "+to_string(normcnum)+
+		"   VGNCooks: " + to_string(vegancnum) + "   VIPCooks: " + to_string(vipcnum));
+
+	Sleep(1000);
 
 	pGUI->UpdateInterface();
 
@@ -312,7 +368,7 @@ void Restaurant::Just_A_Demo()
 
 		int size = (rand() % 6);
 
-		pEv = new ArrivalEvent(EvTime, O_id, (ORD_TYPE)OType, money, size);
+		pEv = new ArrivalEvent(EvTime, O_id, (ORD_TYPE)OType,money,size);
 
 		EventsQueue.enqueue(pEv);
 
@@ -440,11 +496,11 @@ void Restaurant::AddtoDemoQueue(Order* pOrd)
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-void Restaurant::addtonormarlist(Order* po)
+void Restaurant:: addtonormarlist(Order* po)
 {
 	normalorders.InsertEnd(po);
 }
-void Restaurant::addtoveganlist(Order* po)
+void Restaurant::addtoveganlist(Order* po) 
 {
 	veganorders.enqueue(po);
 }
@@ -453,7 +509,7 @@ void Restaurant::addtoviplist(Order* po)
 	viporders.enqueue(po);
 }
 
-void Restaurant::cancelorder(int r_ID)
+void Restaurant:: cancelorder(int r_ID)
 {
 	normalorders.deletebyid(r_ID);
 }
@@ -485,11 +541,14 @@ int Restaurant::GetNumVip()
 }
 
 void Restaurant::ReadFile()
+
 {
 
 	ifstream inputFile;
 
-	string fileName = "../../Input Files/";
+	//string fileName = "../../Input Files/";
+
+	string fileName;
 
 	string temp;
 
@@ -516,20 +575,20 @@ void Restaurant::ReadFile()
 
 	for (int i = 0; i < NormalCooks; i++)
 	{
-		Cook* t = new Cook(i + 1, TYPE_NRM, NormalSpeed);
-		cooklist.InsertEnd(t);
+		Cook* t= new Cook(i + 1,TYPE_NRM,NormalSpeed);
+		normalcooks.InsertEnd(t);
 	}
 
 	for (int i = 0; i < VeganCooks; i++)
 	{
-		Cook* t = new Cook(i + 1 + NormalCooks, TYPE_VGAN, VeganSpeed);
-		cooklist.InsertEnd(t);
+		Cook* t = new Cook(i + 1+NormalCooks,TYPE_VGAN ,VeganSpeed);
+		vegancooks.InsertEnd(t);
 	}
 
 	for (int i = 0; i < VipCooks; i++)
 	{
-		Cook* t = new Cook(i + 1 + NormalCooks + VeganCooks, TYPE_VIP, VipSpeed);
-		cooklist.InsertEnd(t);
+		Cook* t = new Cook(i + 1 + NormalCooks+VeganCooks, TYPE_VIP, VipSpeed);
+		vipcooks.InsertEnd(t);
 	}
 
 
@@ -602,13 +661,15 @@ void Restaurant::ReadFile()
 		case 'P':
 			double ExtraMoney;
 			inputFile >> TS >> ID >> ExtraMoney;
-			pEvent = new PromotionEvent(TS, ID, ExtraMoney);
+			/*create promotion event here*/
+			pEvent = new promote(TS,ID,ExtraMoney);
 			EventsQueue.enqueue(pEvent);
 			break;
 
 		case 'X':
 			inputFile >> TS >> ID;
-			pEvent = new CancellationEvent(TS, ID);
+			/*create cancel event here*/
+			pEvent = new cancel(TS,ID);
 			EventsQueue.enqueue(pEvent);
 			break;
 		}
