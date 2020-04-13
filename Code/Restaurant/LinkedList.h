@@ -60,9 +60,9 @@ public:
 	void deletebyid(int r_ID)
 	{
 		if (!Head)return;
-
-		Node<T>* todelete;
-
+		
+		Node<T>*todelete;
+		
 		if (Head->getID() == r_ID)
 		{
 			todelete = Head;
@@ -71,9 +71,9 @@ public:
 			return;
 		}
 
-		Node<T>* ptr = Head;
+		Node<T>* ptr=Head;
 
-		while (ptr->getNext())
+		while(ptr->getNext())
 		{
 			if (ptr->getNext()->getID() == r_ID)
 			{
@@ -87,10 +87,10 @@ public:
 
 	}
 
-	void InsertEnd(const T& data, int r_ID = -1)
+	void InsertEnd(const T& data,int r_ID=-1)
 	{
 		Node<T>* ptr = Head;
-		Node<T>* New = new Node<T>(data, r_ID);
+		Node<T>* New = new Node<T>(data,r_ID);
 		New->setItem(data);
 		if (!Head)
 		{
