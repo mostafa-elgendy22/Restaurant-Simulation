@@ -14,9 +14,9 @@
 
 #include "..\Events\Event.h"
 
-#include"../PriorityQueue.h"
+#include"../PriotiyQueue.h"
 
-#include "../LinkedList.h"
+#include "../LInkedList.h"
 
 #include "Order.h"
 
@@ -42,14 +42,14 @@ private:
 
 	//	DEMO-related members. Should be removed in phases 1&2
 
-	Queue<Order*> DEMO_Queue;	//Important: This is just for demo
+		Queue<Order*> DEMO_Queue;	//Important: This is just for demo
 
-/// ==>
+	/// ==>
 
 
-//our data structures for orders
-	PriorityQueue<Order*>viporders;
-
+	//our data structures for orders
+	priorityqueue<Order*>viporders;
+	
 	LinkedList<Order*>normalorders;
 
 	Queue<Order*>veganorders;
@@ -58,7 +58,12 @@ private:
 
 	LinkedList<Order*>finished;
 
-	LinkedList<Cook*>cooklist;
+	LinkedList<Cook*>normalcooks;
+
+	LinkedList<Cook*>vegancooks;
+
+	LinkedList<Cook*>vipcooks;
+
 
 	//
 
@@ -132,11 +137,11 @@ public:
 	void Just_A_Demo();	//just to show a demo and should be removed in phase1 1 & 2
 	void AddtoDemoQueue(Order* po);	//adds an order to the demo queue
 
-	void addtonormarlist(Order* po);  //adding orders to different datastructures
+	void addtonormarlist(Order*po);  //adding orders to different datastructures
 	void addtoveganlist(Order* po);
 	void addtoviplist(Order* po);
 	void simulate();
-	/// ================================================================================================== 
+/// ================================================================================================== 
 
 
 
