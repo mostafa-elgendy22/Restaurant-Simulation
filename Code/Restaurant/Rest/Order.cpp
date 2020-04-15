@@ -69,7 +69,10 @@ void Order::setStatus(ORD_STATUS s)
 	status = s;
 }
 
-
+void Order::SetType(ORD_TYPE typ)
+{
+	type = typ;
+}
 
 ORD_STATUS Order::getStatus() const
 

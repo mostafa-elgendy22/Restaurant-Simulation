@@ -108,17 +108,17 @@
     <ClInclude Include="Rest\Cook.h">
       <Filter>Restaurant</Filter>
     </ClInclude>
-    <ClInclude Include="PromotionEvent.h">
-      <Filter>Events</Filter>
-    </ClInclude>
-    <ClInclude Include="CancellationEvent.h">
-      <Filter>Events</Filter>
-    </ClInclude>
     <ClInclude Include="PriorityQueue.h">
       <Filter>Generic_DS</Filter>
     </ClInclude>
     <ClInclude Include="LinkedList.h">
       <Filter>Generic_DS</Filter>
+    </ClInclude>
+    <ClInclude Include="CancellationEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="PromotionEvent.h">
+      <Filter>Events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -245,13 +245,13 @@
     <ClCompile Include="Rest\Cook.cpp">
       <Filter>Restaurant</Filter>
     </ClCompile>
-    <ClCompile Include="PromotionEvent.cpp">
-      <Filter>Events</Filter>
-    </ClCompile>
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="CancellationEvent.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="PromotionEvent.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMUgraphicsLib\Manual.txt">

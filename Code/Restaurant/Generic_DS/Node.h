@@ -19,7 +19,7 @@ public:
 	T getItem() const;
 	Node<T>* getNext() const;
 	int getID();
-}; // end Node
+}; 
 
 
 template < typename T>

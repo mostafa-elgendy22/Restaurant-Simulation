@@ -2,20 +2,23 @@
 #define _LINKEDLIST
 
 #include "Generic_DS/Node.h"
-#include"iostream"
-using namespace std;
+
 
 template <typename T>
 class LinkedList
 {
 private:
 	Node<T>* Head;	//Pointer to the head of the list
+
+	Node<T>* Back;
+
 public:
 
 
 	LinkedList()
 	{
 		Head = nullptr;
+		Back = nullptr;
 	}
 
 	~LinkedList()
@@ -28,22 +31,17 @@ public:
 		return Head == nullptr;
 	}
 
-	void PrintList()	const
-	{
-		Node<T>* p = Head;
-		while (p)
-		{
-			cout << p->getItem() << " ";
-			p = p->getNext();
-		}
-	}
-
 	void InsertBeg(const T& data)
 	{
+		if (!Head)
+		{
+			Head = new Node<T>(data);
+			Back = Head;
+			return;
+		}
 		Node<T>* R = new Node<T>(data);
 		R->setNext(Head);
 		Head = R;
-
 	}
 
 	void DeleteAll()
@@ -59,10 +57,11 @@ public:
 
 	void deletebyid(int r_ID)
 	{
-		if (!Head)return;
-		
-		Node<T>*todelete;
-		
+		if (!Head)
+			return;
+
+		Node<T>* todelete;
+
 		if (Head->getID() == r_ID)
 		{
 			todelete = Head;
@@ -71,9 +70,9 @@ public:
 			return;
 		}
 
-		Node<T>* ptr=Head;
+		Node<T>* ptr = Head;
 
-		while(ptr->getNext())
+		while (ptr->getNext())
 		{
 			if (ptr->getNext()->getID() == r_ID)
 			{
@@ -87,26 +86,28 @@ public:
 
 	}
 
-	void InsertEnd(const T& data,int r_ID=-1)
+	void InsertEnd(const T& data, int r_ID = -1)
 	{
-		Node<T>* ptr = Head;
-		Node<T>* New = new Node<T>(data,r_ID);
-		New->setItem(data);
+		Node<T>* New = new Node<T>(data, r_ID);
+
 		if (!Head)
 		{
 			Head = New;
+			Back = Head;
 			Head->setNext(nullptr);
 			return;
 		}
-		while (ptr->getNext())
-			ptr = ptr->getNext();
-
-		ptr->setNext(New);
-		New->setNext(nullptr);
-
+		if (Head == Back)
+		{
+			Head->setNext(New);
+			Back = New;
+			return;
+		}
+		Back->setNext(New);
+		Back = New;
 	}
 
-	bool dequeue(T& frntEntry)
+	bool dequeue(T& frntEntry)  //to get the head
 	{
 		if (isempty())
 			return false;
@@ -144,6 +145,33 @@ public:
 		return Arr;
 	}
 
+	bool SearchByID(int ID, T& entry) //to get orders by their id
+	{
+		if (Head && Head->getID() == ID)
+		{
+			entry = Head->getItem();
+			return true;
+		}
+		if (Back && Back->getID() == ID)
+		{
+			entry = Back->getItem();
+			return true;
+		}
+		Node<T>* ptr;
+		if (Head)
+		{
+			ptr = Head->getNext();
+		}
+		while (ptr)
+		{
+			if (ptr->getID() == ID)
+			{
+				entry = ptr->getItem();
+				return true;
+			}
+			ptr = ptr->getNext();
+		}
+		return false;
+	}
 };
-
 #endif	

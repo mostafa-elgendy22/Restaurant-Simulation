@@ -14,18 +14,14 @@
 
 #include "..\Events\Event.h"
 
-#include"../PriotiyQueue.h"
+#include"../PriorityQueue.h"
 
 #include "../LInkedList.h"
 
 #include "Order.h"
 
 
-
-// it is the maestro of the project
-
 class Restaurant
-
 {
 
 private:
@@ -35,122 +31,97 @@ private:
 	Queue<Event*> EventsQueue;	//Queue of all events that will be loaded from file
 
 
+	//our data structures 
 
 
+	//lists of orders
 
-	/// ==> 
+	priorityqueue<Order*>VipOrders;
 
-	//	DEMO-related members. Should be removed in phases 1&2
+	LinkedList<Order*>NormalOrders;
 
-		Queue<Order*> DEMO_Queue;	//Important: This is just for demo
+	Queue<Order*>VeganOrders;
 
-	/// ==>
+	/***/
 
+	LinkedList<Order*>InServiceOrders;
 
-	//our data structures for orders
-	priorityqueue<Order*>viporders;
-	
-	LinkedList<Order*>normalorders;
+	Queue<Order*>FinishedOrders;
 
-	Queue<Order*>veganorders;
+	//lists of cooks
 
-	LinkedList<Order*>inservice;
+	Queue<Cook*>NormalCooks;
 
-	LinkedList<Order*>finished;
+	Queue<Cook*>VeganCooks;
 
-	LinkedList<Cook*>normalcooks;
+	Queue<Cook*>VipCooks;
 
-	LinkedList<Cook*>vegancooks;
+	/**/
 
-	LinkedList<Cook*>vipcooks;
+	// to be used in phase 2
 
+	Queue<Cook*>NormalInBreak;
 
-	//
+	Queue<Cook*>VeganInBreak;
 
-	// TODO: Add More Data Members As Needed
+	Queue<Cook*>VipInBreak;
 
-	//
-
-
+	/***/
 
 	int maxCooks;           //number of orders a cook must prepare before taking a break
 
-	int NormalCooks;        //number of normal cooks
+	int NumNormalCooks;        //number of normal cooks
 
 	int NormalSpeed;        //speed of normal cooks
 
 	int NormalBreak;        //break duration of normal cooks
 
-	int VeganCooks;         //number of vegan cooks
+	int NumVeganCooks;         //number of vegan cooks
 
 	int VeganSpeed;         //speed of vegan cooks
 
 	int VeganBreak;         //break duration of vegan cooks
 
-	int VipCooks;           //number of vip cooks
+	int NumVipCooks;           //number of vip cooks
 
 	int VipSpeed;           //speed of vip cooks
 
 	int VipBreak;           //break duration of vip cooks
 
-	int AutoPromoted; //the number of time steps after which an order is automaticallt promoted to vip
+	int AutoPromoted;       //the number of time steps after which an order is automaticallt promoted to vip
 
 	int EventsNumber;
 
 public:
 
-
-
 	Restaurant();
 
 	~Restaurant();
-
-
 
 	void ExecuteEvents(int TimeStep);	//executes all events at current timestep
 
 	void RunSimulation();
 
 	void cancelorder(int r_ID);
-
-
+	 
+	void PromoteOrder(int Oid);         //to be implemented in phase 2
 
 	void FillDrawingList(int CurrentTimeStep);
 
-
-
-	//
-
-	// TODO: Add More Member Functions As Needed
-
-	//
-
 	int GetNumNormal();
+
 	int GetNumVegan();
+	
 	int GetNumVip();
+	
 	void ReadFile();
 
-	/// ===================    DEMO-related functions. Should be removed in phases 1&2   ================= 
+	void addtonormarlist(Order* po);  //adding orders to different data structures
 
-
-
-	void Just_A_Demo();	//just to show a demo and should be removed in phase1 1 & 2
-	void AddtoDemoQueue(Order* po);	//adds an order to the demo queue
-
-	void addtonormarlist(Order*po);  //adding orders to different datastructures
 	void addtoveganlist(Order* po);
+
 	void addtoviplist(Order* po);
+
 	void simulate();
-/// ================================================================================================== 
-
-
-
-
-
-
-
 };
-
-
-
 #endif

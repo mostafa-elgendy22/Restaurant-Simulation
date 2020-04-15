@@ -1,8 +1,7 @@
 #pragma once
 
-
 #include"Generic_DS/Node.h"
-#include"Generic_DS/Queue.h"
+
 
 template<typename T>
 class priorityqueue
@@ -17,10 +16,8 @@ public:
 	virtual bool enqueue(const T& newEntry);
 	bool dequeue(T& frntEntry);
 	bool peekFront(T& frntEntry)  const;
-	//T* toArray(int& count);	//returns array of T (array if items)
+	T* toArray(int& count);	//returns array of T (array if items)
 	~priorityqueue();
-	T* toArray(int&);
-
 
 };
 
@@ -70,8 +67,7 @@ bool priorityqueue<T>::enqueue(const T& newEntry)
 		newnode->setNext(backPtr);
 	}
 	else
-	{
-			
+	{	
 		newnode->setNext(backPtr->getNext());
 		backPtr->setNext(newnode);
 		backPtr = newnode;

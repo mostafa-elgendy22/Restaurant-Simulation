@@ -69,6 +69,8 @@ public:
 
 	//
 
+	void SetType(ORD_TYPE typ);
+
 	bool operator> (const Order& x)const;
 
 };
