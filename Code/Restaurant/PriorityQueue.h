@@ -4,37 +4,38 @@
 
 
 template<typename T>
-class priorityqueue
+class PriorityQueue
 {
 private:
 
 	Node<T>* backPtr;
 
 public:
-	priorityqueue();
+	PriorityQueue();
 	bool isEmpty() const;
 	virtual bool enqueue(const T& newEntry);
 	bool dequeue(T& frntEntry);
 	bool peekFront(T& frntEntry)  const;
-	T* toArray(int& count);	//returns array of T (array if items)
-	~priorityqueue();
-
+	T* toArray(int& count);	//returns array of T (array of items)
+	~PriorityQueue();
 };
 
+
+
 template<typename T>
-priorityqueue<T>::priorityqueue()
+PriorityQueue<T>::PriorityQueue()
 {
 	backPtr = nullptr;
 }
 
 template<typename T>
-bool priorityqueue<T>::isEmpty() const
+bool PriorityQueue<T>::isEmpty() const
 {
 	return backPtr == nullptr;
 }
 
 template<typename T>
-bool priorityqueue<T>::enqueue(const T& newEntry)
+bool PriorityQueue<T>::enqueue(const T& newEntry)
 {
 	Node<T>* newnode = new Node<T>(newEntry);
 
@@ -75,13 +76,11 @@ bool priorityqueue<T>::enqueue(const T& newEntry)
 
 	
 	return true;
-
-
 }
 
 
 template<typename T>
-bool priorityqueue<T>::dequeue(T& frntEntry)
+bool PriorityQueue<T>::dequeue(T& frntEntry)
 {
 	if (isEmpty())return false;
 
@@ -95,11 +94,10 @@ bool priorityqueue<T>::dequeue(T& frntEntry)
 	//delete nodeToDeletePtr;
 
 	return true;
-
 }
 
 template<typename T>
-bool priorityqueue<T>::peekFront(T& frntEntry)  const
+bool PriorityQueue<T>::peekFront(T& frntEntry)  const
 {
 	if (isEmpty())
 		return false;
@@ -111,14 +109,14 @@ bool priorityqueue<T>::peekFront(T& frntEntry)  const
 
 
 template<typename T>
-priorityqueue<T>::~priorityqueue()
+PriorityQueue<T>::~PriorityQueue()
 {
 	
 }
 
 
 template <typename T>
-T* priorityqueue<T>::toArray(int& count)
+T* PriorityQueue<T>::toArray(int& count)
 {
 	count = 0;
 

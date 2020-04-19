@@ -10,10 +10,9 @@ class LinkedList
 private:
 	Node<T>* Head;	//Pointer to the head of the list
 
-	Node<T>* Back;
+	Node<T>* Back;  //Pointer to the back of the list
 
 public:
-
 
 	LinkedList()
 	{
@@ -26,23 +25,32 @@ public:
 		DeleteAll();
 	}
 
-	bool isempty()
+	bool isEmpty()
 	{
 		return Head == nullptr;
 	}
 
-	void InsertBeg(const T& data)
+	void InsertEnd(const T& data)
 	{
+		Node<T>* ptr = new Node<T>(data);
+
 		if (!Head)
 		{
-			Head = new Node<T>(data);
+			Head = ptr;
 			Back = Head;
+			Head->setNext(nullptr);
 			return;
 		}
-		Node<T>* R = new Node<T>(data);
-		R->setNext(Head);
-		Head = R;
+		if (Head == Back)
+		{
+			Head->setNext(ptr);
+			Back = ptr;
+			return;
+		}
+		Back->setNext(ptr);
+		Back = ptr;
 	}
+
 
 	void DeleteAll()
 	{
@@ -55,14 +63,14 @@ public:
 		}
 	}
 
-	void deletebyid(int r_ID)
+	void DeleteByID(int ID)
 	{
 		if (!Head)
 			return;
 
 		Node<T>* todelete;
 
-		if (Head->getID() == r_ID)
+		if (Head->getItem()->GetID()==ID)
 		{
 			todelete = Head;
 			Head = Head->getNext();
@@ -74,7 +82,7 @@ public:
 
 		while (ptr->getNext())
 		{
-			if (ptr->getNext()->getID() == r_ID)
+			if (ptr->getNext()->getItem()->GetID() == ID)
 			{
 				todelete = ptr->getNext();
 				ptr = ptr->getNext()->getNext();
@@ -83,33 +91,11 @@ public:
 			}
 		}
 		todelete = nullptr;
-
 	}
 
-	void InsertEnd(const T& data, int r_ID = -1)
+	bool head(T& frntEntry)  //to get the head
 	{
-		Node<T>* New = new Node<T>(data, r_ID);
-
-		if (!Head)
-		{
-			Head = New;
-			Back = Head;
-			Head->setNext(nullptr);
-			return;
-		}
-		if (Head == Back)
-		{
-			Head->setNext(New);
-			Back = New;
-			return;
-		}
-		Back->setNext(New);
-		Back = New;
-	}
-
-	bool dequeue(T& frntEntry)  //to get the head
-	{
-		if (isempty())
+		if (isEmpty())
 			return false;
 
 		Node<T>* nodeToDeletePtr = Head;
@@ -126,15 +112,15 @@ public:
 
 		if (!Head)
 			return nullptr;
-		//counting the no. of items in the Queue
+
+		//counting the no. of items in the list
+		
 		Node<T>* p = Head;
 		while (p)
 		{
 			count++;
 			p = p->getNext();
 		}
-
-
 		T* Arr = new T[count];
 		p = Head;
 		for (int i = 0; i < count; i++)

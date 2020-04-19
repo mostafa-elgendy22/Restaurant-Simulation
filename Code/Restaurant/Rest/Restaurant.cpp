@@ -3,61 +3,55 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-
 #include"..\PromotionEvent.h"
-
 #include "Restaurant.h"
-
 #include "..\Events\ArrivalEvent.h"
-
 #include"..\CancellationEvent.h"
 
 
-
-
 Restaurant::Restaurant()
-
 {
 	pGUI = NULL;
 }
 
 
-
 void Restaurant::RunSimulation()
 {
 	pGUI = new GUI;
+	PROG_MODE mode = pGUI->getGUIMode();
 
-	PROG_MODE	mode = pGUI->getGUIMode();
-
-
-
-	switch (mode)	
+	switch (mode)
 	{
-
 	case MODE_INTR:
-		simulate();
+		ReadFile();
+		RunInteractive();
 		break;
 
 	case MODE_STEP:
-
+		ReadFile();
+		RunStepByStep();
 		break;
 
 	case MODE_SLNT:
-
+		ReadFile();
+		PrintFile();
 		break;
-
 	};
 }
 
 
+void Restaurant::RunInteractive()
+{
+
+}
 
 
+void Restaurant::RunStepByStep()
+{
 
-
+}
 
 //////////////////////////////////  Event handling functions   /////////////////////////////
-
-
 
 
 void Restaurant::ExecuteEvents(int CurrentTimeStep)
@@ -66,15 +60,11 @@ void Restaurant::ExecuteEvents(int CurrentTimeStep)
 
 	while (EventsQueue.peekFront(pE))	//as long as there are more events
 	{
-
 		if (pE->getEventTime() > CurrentTimeStep)	//no more events at current timestep
-
 			return;
 
 
-
 		pE->Execute(this);
-
 		EventsQueue.dequeue(pE);	//remove event from the queue
 
 		delete pE;		//deallocate event object from memory
@@ -83,60 +73,14 @@ void Restaurant::ExecuteEvents(int CurrentTimeStep)
 }
 
 Restaurant::~Restaurant()
-
 {
-
 	if (pGUI)
-
-		delete pGUI;
-
-}
-
-void Restaurant::simulate()
-{
-	int timestep = 0;
-	int ordernum = 0;
-	ReadFile();
-	pGUI->PrintMessage("Click to continue");
-	while (!InServiceOrders.isempty() || !NormalOrders.isempty()
-		|| !VipOrders.isEmpty() || !VeganOrders.isEmpty() ||
-		!EventsQueue.isEmpty())
 	{
-		pGUI->waitForClick();
-		timestep++;
-		ExecuteEvents(timestep);
-		Order* ptr;
-		if (NormalOrders.dequeue(ptr))
-		{
-			ptr->setStatus(SRV);
-			InServiceOrders.InsertEnd(ptr);
-		}
-		if (VipOrders.dequeue(ptr))
-		{
-			ptr->setStatus(SRV);
-			InServiceOrders.InsertEnd(ptr);
-		}
-		if (VeganOrders.dequeue(ptr))
-		{
-			ptr->setStatus(SRV);
-			InServiceOrders.InsertEnd(ptr);
-		}
-		if (timestep % 5 == 0)
-		{
-			int t = 3;
-			while (t--)
-			{
-				if (!InServiceOrders.dequeue(ptr))
-					break;
-				ptr->setStatus(DONE);
-				FinishedOrders.enqueue(ptr);
-			}
-		}
-		FillDrawingList(timestep);
+		delete pGUI;
 	}
-	pGUI->PrintMessage("Simulation ended, click to exit");
-	pGUI->waitForClick();
+
 }
+
 
 void Restaurant::FillDrawingList(int CurrentTimeStep)
 {
@@ -160,25 +104,28 @@ void Restaurant::FillDrawingList(int CurrentTimeStep)
 		pGUI->AddToDrawingList(ord[i]);
 	}
 
-	ord = NormalOrders.toArray(orders);
+	NormalOrder** pNorm;
+	pNorm = NormalOrders.toArray(orders);
 	int normnum = orders;
 	for (int i = 0; i < orders; i++)
 	{
-		pGUI->AddToDrawingList(ord[i]);
+		pGUI->AddToDrawingList(pNorm[i]);
 	}
 
-	ord = VeganOrders.toArray(orders);
+	VeganOrder** pVgn;
+	pVgn = VeganOrders.toArray(orders);
 	int vegannum = orders;
 	for (int i = 0; i < orders; i++)
 	{
-		pGUI->AddToDrawingList(ord[i]);
+		pGUI->AddToDrawingList(pVgn[i]);
 	}
 
-	ord = VipOrders.toArray(orders);
+	VipOrder** pVip;
+	pVip = VipOrders.toArray(orders);
 	int vipnum = orders;
 	for (int i = 0; i < orders; i++)
 	{
-		pGUI->AddToDrawingList(ord[i]);
+		pGUI->AddToDrawingList(pVip[i]);
 	}
 
 	int cooks;
@@ -213,30 +160,30 @@ void Restaurant::FillDrawingList(int CurrentTimeStep)
 
 
 	pGUI->UpdateInterface();
-
 }
 
 
-void Restaurant::addtonormarlist(Order* po)
+void Restaurant::AddToNormalList(NormalOrder* po)
 {
 	NormalOrders.InsertEnd(po);
 }
-void Restaurant::addtoveganlist(Order* po)
+void Restaurant::AddToVeganList(VeganOrder* po)
 {
 	VeganOrders.enqueue(po);
 }
-void Restaurant::addtoviplist(Order* po)
+void Restaurant::AddToVipList(VipOrder* po)
 {
 	VipOrders.enqueue(po);
 }
 
-void Restaurant::cancelorder(int r_ID)
+void Restaurant::CancelOrder(int r_ID)
 {
-	NormalOrders.deletebyid(r_ID);
+	NormalOrders.DeleteByID(r_ID);
 }
 
 void Restaurant::PromoteOrder(int Oid)
-{}
+{
+}
 
 
 int Restaurant::GetNumNormal()
@@ -257,107 +204,75 @@ int Restaurant::GetNumVip()
 void Restaurant::ReadFile()
 {
 	ifstream inputFile;
-
 	string fileName = "../../Input Files/";
-
 	string temp;
+	int AutoPromote, NormalSpeed, VeganSpeed, VipSpeed, maxNumOrders, NormalBreak, VeganBreak, VipBreak;
 
-	pGUI->PrintMessage("Enter the name of the file : ");
-
+	pGUI->PrintMessage("Enter the name of the input file : ");
 	temp = pGUI->GetString();
-
 	temp += ".txt";
-
 	fileName += temp;
-
 	inputFile.open(fileName, ios::in);
 
 
 	inputFile >> NumNormalCooks >> NumVeganCooks >> NumVipCooks;
-
 	inputFile >> NormalSpeed >> VeganSpeed >> VipSpeed;
-
-	inputFile >> maxCooks >> NormalBreak >> VeganBreak >> VipBreak;
-
-	inputFile >> AutoPromoted;
-
+	inputFile >> maxNumOrders >> NormalBreak >> VeganBreak >> VipBreak;
+	inputFile >> AutoPromote;
 	inputFile >> EventsNumber;
 
 	for (int i = 0; i < NumNormalCooks; i++)
 	{
-		Cook* t = new Cook(i + 1, TYPE_NRM, NormalSpeed);
-		NormalCooks.enqueue(t);
+		Cook* c = new Cook(i + 1, TYPE_NRM, NormalSpeed, maxNumOrders, NormalBreak);
+		NormalCooks.enqueue(c);
 	}
 
 	for (int i = 0; i < NumVeganCooks; i++)
 	{
-		Cook* t = new Cook(i + 1 + NumNormalCooks, TYPE_VGAN, VeganSpeed);
-		VeganCooks.enqueue(t);
+		Cook* c = new Cook(i + 1 + NumNormalCooks, TYPE_VGAN, VeganSpeed, maxNumOrders, VeganBreak);
+		VeganCooks.enqueue(c);
 	}
 
 	for (int i = 0; i < NumVipCooks; i++)
 	{
-		Cook* t = new Cook(i + 1 + NumNormalCooks + NumVeganCooks, TYPE_VIP, VipSpeed);
-		VipCooks.enqueue(t);
+		Cook* c = new Cook(i + 1 + NumNormalCooks + NumVeganCooks, TYPE_VIP, VipSpeed, maxNumOrders, VipBreak);
+		VipCooks.enqueue(c);
 	}
-
 
 	//Reading Events
 
 	for (int i = 0; i < EventsNumber; i++)
-
 	{
-
-		int ID;   //id of the order
-
-		int TS;  //timestep 
-
-
-
+		int ID;      //id of the order
+		int TS;      //timestep 
 		Event* pEvent = NULL;
-
 		char EventChar;
-
 		inputFile >> EventChar;
 
 		switch (EventChar)
 		{
-
 		case 'R':
-
 			char orderType;
-
 			int size;
-
 			double orderMoney;
-
 			inputFile >> orderType >> TS >> ID >> size >> orderMoney;
 
 			switch (orderType)
 			{
-
 			case 'N':
-
 				pEvent = new ArrivalEvent(TS, ID, TYPE_NRM, orderMoney, size);
 				break;
 
 			case 'G':
-
 				pEvent = new ArrivalEvent(TS, ID, TYPE_VGAN, orderMoney, size);
 				break;
 
 			case 'V':
-
 				pEvent = new ArrivalEvent(TS, ID, TYPE_VIP, orderMoney, size);
 				break;
-
 			}
-
 			EventsQueue.enqueue(pEvent);
-
 			break;
-
-
 
 		case 'P':
 			double ExtraMoney;
@@ -373,5 +288,19 @@ void Restaurant::ReadFile()
 			break;
 		}
 	}
+}
 
+void Restaurant::PrintFile()
+{
+	ofstream OutputFile;
+	string fileName = "../../Output Files/";
+	string temp;
+
+	pGUI->PrintMessage("Enter the name of the output file : ");
+	temp = pGUI->GetString();
+	temp += ".txt";
+	fileName += temp;
+	OutputFile.open(fileName, ios::out);
+
+	//print info here
 }

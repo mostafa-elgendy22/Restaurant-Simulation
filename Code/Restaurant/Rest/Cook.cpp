@@ -1,16 +1,13 @@
 #include "Cook.h"
 
 
-Cook::Cook()
-{
-}
-
-
-Cook::Cook(int r_id, ORD_TYPE r_type, int r_speed)
+Cook::Cook(int r_id, ORD_TYPE r_type, int r_speed, int max, int Break)
 {
 	ID = r_id;
 	type = r_type;
 	speed = r_speed;
+	maxNumCooks = max;
+	BreakDuration = Break;
 }
 
 Cook::~Cook()

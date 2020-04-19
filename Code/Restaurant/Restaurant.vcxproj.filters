@@ -120,6 +120,15 @@
     <ClInclude Include="PromotionEvent.h">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="NormalOrder.h">
+      <Filter>Restaurant</Filter>
+    </ClInclude>
+    <ClInclude Include="VeganOrder.h">
+      <Filter>Restaurant</Filter>
+    </ClInclude>
+    <ClInclude Include="VipOrder.h">
+      <Filter>Restaurant</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CMUgraphicsLib\jpeg\jcomapi.c">
@@ -251,6 +260,15 @@
     </ClCompile>
     <ClCompile Include="PromotionEvent.cpp">
       <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="NormalOrder.cpp">
+      <Filter>Restaurant</Filter>
+    </ClCompile>
+    <ClCompile Include="VeganOrder.cpp">
+      <Filter>Restaurant</Filter>
+    </ClCompile>
+    <ClCompile Include="VipOrder.cpp">
+      <Filter>Restaurant</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

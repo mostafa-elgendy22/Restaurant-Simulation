@@ -103,11 +103,14 @@
     <ClInclude Include="Generic_DS\Queue.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="LinkedList.h" />
+    <ClInclude Include="NormalOrder.h" />
     <ClInclude Include="PriorityQueue.h" />
     <ClInclude Include="PromotionEvent.h" />
     <ClInclude Include="Rest\Cook.h" />
     <ClInclude Include="Rest\Order.h" />
     <ClInclude Include="Rest\Restaurant.h" />
+    <ClInclude Include="VeganOrder.h" />
+    <ClInclude Include="VipOrder.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CancellationEvent.cpp" />
@@ -150,10 +153,13 @@
     <ClCompile Include="Events\Event.cpp" />
     <ClCompile Include="Events\ArrivalEvent.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
+    <ClCompile Include="NormalOrder.cpp" />
     <ClCompile Include="PromotionEvent.cpp" />
     <ClCompile Include="Rest\Cook.cpp" />
     <ClCompile Include="Rest\Order.cpp" />
     <ClCompile Include="Rest\Restaurant.cpp" />
+    <ClCompile Include="VeganOrder.cpp" />
+    <ClCompile Include="VipOrder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMUgraphicsLib\Manual.txt" />

@@ -8,5 +8,5 @@ CancellationEvent::CancellationEvent(int eTime, int oID) :Event(eTime, oID)
 
 void CancellationEvent::Execute(Restaurant* pRest)	//overrided execute function
 {
-	pRest->cancelorder(this->getOrderID());
+	pRest->CancelOrder(this->getOrderID());
 }

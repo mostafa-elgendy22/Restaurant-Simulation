@@ -11,13 +11,14 @@ private :
 	
 	Node<T>* backPtr;
 	Node<T>* frontPtr;
+
 public :
 	Queue();	
 	bool isEmpty() const ;
 	bool enqueue(const T& newEntry);
 	bool dequeue(T& frntEntry);  
 	bool peekFront(T& frntEntry)  const;
-	T* toArray(int& count);	//returns array of T (array if items)
+	T* toArray(int& count);	//returns array of T (array of items)
 	~Queue();
 };
 
@@ -26,17 +27,13 @@ Queue<T>::Queue()
 {
 	backPtr=nullptr;
 	frontPtr=nullptr;
-
 }
 
 
 template <typename T>
 bool Queue<T>::isEmpty() const
 {
-	if(frontPtr==nullptr)
-		return true;
-	else
-		return false;
+	return frontPtr == nullptr;
 }
 
 
@@ -50,7 +47,7 @@ bool Queue<T>::enqueue( const T& newEntry)
 	else
 		backPtr->setNext(newNodePtr); // The queue was not empty
 	backPtr = newNodePtr; // New node is at back
-	return true ;
+	return true;
 } 
 
 
@@ -73,7 +70,6 @@ bool Queue<T>:: dequeue(T& frntEntry)
 
 
 	return true;
-
 }
 
 
@@ -85,7 +81,6 @@ bool Queue<T>:: peekFront(T& frntEntry) const
 
 	frntEntry = frontPtr->getItem();
 	return true;
-
 }
 
 

@@ -4,18 +4,21 @@
 #include "Event.h"
 
 
-//class for the arrival event
-class ArrivalEvent: public Event
+
+class ArrivalEvent : public Event
 {
-	//info about the order ralted to arrival event
-	int OrdSize;	//order distance
-	ORD_TYPE OrdType;		//order type: Normal, vegan, VIP	                
+	int OrdSize;	      //order distance
+	ORD_TYPE OrdType;    //order type: Normal, vegan, VIP	                
 	double OrdMoney;	//Total order money
+	int autoP;          //for normal orders
+
+
 public:
-	ArrivalEvent(int eTime, int oID, ORD_TYPE oType,double oMoney, int size);
-	//Add more constructors if needed
-	
-	virtual void Execute(Restaurant *pRest);	//override execute function
+
+	ArrivalEvent(int eTime, int oID, ORD_TYPE oType, double oMoney, int size, int autoP = -1);
+
+
+	virtual void Execute(Restaurant* pRest);	//override execute function
 
 };
 
