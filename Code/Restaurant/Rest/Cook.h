@@ -20,5 +20,5 @@ public:
 	ORD_TYPE GetType() const;
 	void setID(int);
 	void setType(ORD_TYPE);
-
+	int GetSpeed() const;
 };

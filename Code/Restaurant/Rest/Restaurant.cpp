@@ -12,6 +12,8 @@
 Restaurant::Restaurant()
 {
 	pGUI = NULL;
+	pServ = NULL;
+	currentTimeStep = 0;
 }
 
 
@@ -51,9 +53,6 @@ void Restaurant::RunStepByStep()
 
 }
 
-//////////////////////////////////  Event handling functions   /////////////////////////////
-
-
 void Restaurant::ExecuteEvents(int CurrentTimeStep)
 {
 	Event* pE;
@@ -72,13 +71,17 @@ void Restaurant::ExecuteEvents(int CurrentTimeStep)
 	}
 }
 
+void Restaurant::AssignOrders()
+{
+
+}
+
 Restaurant::~Restaurant()
 {
 	if (pGUI)
 	{
 		delete pGUI;
 	}
-
 }
 
 
@@ -183,8 +186,8 @@ void Restaurant::CancelOrder(int r_ID)
 
 void Restaurant::PromoteOrder(int Oid)
 {
-}
 
+}
 
 int Restaurant::GetNumNormal()
 {

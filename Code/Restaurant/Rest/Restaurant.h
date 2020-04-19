@@ -6,12 +6,13 @@
 #include "..\GUI\GUI.h"
 #include "..\Generic_DS\Queue.h"
 #include "..\Events\Event.h"
-#include"../PriorityQueue.h"
+#include "../PriorityQueue.h"
 #include "../LinkedList.h"
 #include "Order.h"
 #include "../VipOrder.h"
 #include "../VeganOrder.h"
 #include "../NormalOrder.h"
+#include "../ServeOrder.h"
 
 
 class Restaurant
@@ -20,40 +21,29 @@ private:
 
 	GUI* pGUI;
 	Queue<Event*> EventsQueue;	   //Queue of all events that will be loaded from file
-
-	//lists of orders
+	ServeOrder* pServ;
 
 	PriorityQueue<VipOrder*> VipOrders;
 	LinkedList<NormalOrder*> NormalOrders;
 	Queue<VeganOrder*> VeganOrders;
 
-	/***/
-
 	LinkedList<Order*>InServiceOrders;
 	Queue<Order*>FinishedOrders;
-
-	//lists of cooks
 
 	Queue<Cook*>NormalCooks;
 	Queue<Cook*>VeganCooks;
 	Queue<Cook*>VipCooks;
 
-	/**/
-
-	/**/
-
 	Queue<Cook*>NormalInBreak;
 	Queue<Cook*>VeganInBreak;
 	Queue<Cook*>VipInBreak;
-
-	/***/
-
 
 	int NumNormalCooks;         //number of normal cooks
 	int NumVeganCooks;         //number of vegan cooks
 	int NumVipCooks;          //number of vip cooks
 
 	int EventsNumber;
+	int currentTimeStep;
 
 public:
 
@@ -74,7 +64,7 @@ public:
 	int GetNumNormal();
 
 	int GetNumVegan();
-
+	
 	int GetNumVip();
 
 	void ReadFile();
@@ -87,10 +77,10 @@ public:
 
 	void AddToVipList(VipOrder* po);
 
-	void RunInteractive();
+	void RunInteractive();               //for simulation
 
-	void RunStepByStep();
+	void RunStepByStep();            
 
-	void simulate();
+	void AssignOrders();           
 };
 #endif
