@@ -43,6 +43,12 @@ public:
 	void SetType(ORD_TYPE typ);
 
 	bool operator > (const Order& x) const;
+
+	int GetAT();
+	
+	int GetST();
+
+	int GetFT();
 };
 
 #endif

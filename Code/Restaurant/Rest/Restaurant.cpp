@@ -14,6 +14,8 @@ Restaurant::Restaurant()
 	pGUI = NULL;
 	pServ = NULL;
 	currentTimeStep = 0;
+	NumAutoPromoted = 0;
+	NormalNum = VeganNum = VipNum = 0;
 }
 
 
@@ -44,6 +46,7 @@ void Restaurant::RunSimulation()
 
 void Restaurant::RunInteractive()
 {
+	FillDrawingList();
 
 }
 
@@ -85,13 +88,13 @@ Restaurant::~Restaurant()
 }
 
 
-void Restaurant::FillDrawingList(int CurrentTimeStep)
+void Restaurant::FillDrawingList()
 {
 	pGUI->ResetDrawingList();
 
 	string timestep;
 
-	timestep += to_string(CurrentTimeStep);
+	timestep += to_string(currentTimeStep);
 
 	int orders;
 	Order** ord = FinishedOrders.toArray(orders);
@@ -169,24 +172,31 @@ void Restaurant::FillDrawingList(int CurrentTimeStep)
 void Restaurant::AddToNormalList(NormalOrder* po)
 {
 	NormalOrders.InsertEnd(po);
+	NormalNum++;
 }
 void Restaurant::AddToVeganList(VeganOrder* po)
 {
 	VeganOrders.enqueue(po);
+	VeganNum++;
 }
 void Restaurant::AddToVipList(VipOrder* po)
 {
 	VipOrders.enqueue(po);
+	VipNum++;
 }
 
 void Restaurant::CancelOrder(int r_ID)
 {
 	NormalOrders.DeleteByID(r_ID);
+	NormalNum--;
 }
 
 void Restaurant::PromoteOrder(int Oid)
 {
 
+	NormalNum--;
+	VipNum++;
+	NumAutoPromoted++;
 }
 
 int Restaurant::GetNumNormal()
@@ -305,5 +315,28 @@ void Restaurant::PrintFile()
 	fileName += temp;
 	OutputFile.open(fileName, ios::out);
 
-	//print info here
+	OutputFile << "FT\tID\tAT\tWT\tST\n";
+	FinishedOrders.Sort();
+	float WT_Sum = 0;
+	float ST_Sum = 0;
+
+	for (int i = 0; i < FinishedOrders.GetCount(); i++)
+	{
+		Order* pOrd;
+		FinishedOrders.head(pOrd);
+		int WT = pOrd->GetFT() - pOrd->GetAT() - pOrd->GetST();
+		OutputFile << pOrd->GetFT() << "\t" << pOrd->GetID() << "\t" << pOrd->GetAT() << "\t";
+		OutputFile << WT << "\t" << pOrd->GetST() << "\n";
+		WT_Sum += WT;
+		ST_Sum += pOrd->GetST();
+	}
+
+	OutputFile << "Orders: " << NormalNum + VeganNum + VipNum;
+	OutputFile << " [Norm:" << NormalNum << ", Veg:" << VeganNum << ", VIP:" << VipNum << "]" << "\n";
+	OutputFile << "Cooks: " << NumNormalCooks + NumVipCooks + NumVeganCooks;
+	OutputFile << " [Norm:" << NumNormalCooks << ", Veg:" << NumVeganCooks << ", VIP:" << NumVipCooks << "]" << "\n";
+	OutputFile << "Avg Wait = " << "" << ",  Avg Serv = " << "" << "\n";
+	OutputFile << "Auto - promoted: " << NumAutoPromoted;
+	OutputFile.close();
 }
+

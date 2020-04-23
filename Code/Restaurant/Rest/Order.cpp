@@ -84,3 +84,19 @@ bool Order::operator> (const Order& x)const
 {
 	return (totalMoney > x.totalMoney);
 }
+
+
+int Order::GetAT()
+{
+	return ArrTime;
+}
+
+int Order::GetST()
+{
+	return ServTime;
+}
+
+int Order::GetFT()
+{
+	return FinishTime;
+}

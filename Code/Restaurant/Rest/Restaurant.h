@@ -28,7 +28,7 @@ private:
 	Queue<VeganOrder*> VeganOrders;
 
 	LinkedList<Order*>InServiceOrders;
-	Queue<Order*>FinishedOrders;
+	LinkedList<Order*>FinishedOrders;
 
 	Queue<Cook*>NormalCooks;
 	Queue<Cook*>VeganCooks;
@@ -44,6 +44,11 @@ private:
 
 	int EventsNumber;
 	int currentTimeStep;
+	int NumAutoPromoted;
+
+	int NormalNum;          //number of normal orders
+	int VeganNum;           //number of vegan orders
+	int VipNum;           //number of vip orders
 
 public:
 
@@ -59,7 +64,7 @@ public:
 
 	void PromoteOrder(int Oid);         //to be implemented in phase 2
 
-	void FillDrawingList(int CurrentTimeStep);
+	void FillDrawingList();
 
 	int GetNumNormal();
 
