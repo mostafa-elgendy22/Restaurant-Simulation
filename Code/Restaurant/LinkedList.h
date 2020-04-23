@@ -12,12 +12,14 @@ private:
 
 	Node<T>* Back;  //Pointer to the back of the list
 
+	int count;
 public:
 
 	LinkedList()
 	{
 		Head = nullptr;
 		Back = nullptr;
+		count = 0;
 	}
 
 	~LinkedList()
@@ -27,7 +29,7 @@ public:
 
 	bool isEmpty()
 	{
-		return Head == nullptr;
+		return count == 0;
 	}
 
 	void InsertEnd(const T& data)
@@ -39,16 +41,19 @@ public:
 			Head = ptr;
 			Back = Head;
 			Head->setNext(nullptr);
+			count++;
 			return;
 		}
 		if (Head == Back)
 		{
 			Head->setNext(ptr);
 			Back = ptr;
+			count++;
 			return;
 		}
 		Back->setNext(ptr);
 		Back = ptr;
+		count++;
 	}
 
 
@@ -61,6 +66,7 @@ public:
 			delete Head;
 			Head = P;
 		}
+		count = 0;
 	}
 
 	void DeleteByID(int ID)
@@ -70,11 +76,12 @@ public:
 
 		Node<T>* todelete;
 
-		if (Head->getItem()->GetID()==ID)
+		if (Head->getItem()->GetID() == ID)
 		{
 			todelete = Head;
 			Head = Head->getNext();
 			delete todelete;
+			count--;
 			return;
 		}
 
@@ -87,6 +94,7 @@ public:
 				todelete = ptr->getNext();
 				ptr = ptr->getNext()->getNext();
 				delete todelete;
+				count--;
 				return;
 			}
 		}
@@ -108,19 +116,11 @@ public:
 
 	T* toArray(int& count)
 	{
-		count = 0;
 
 		if (!Head)
 			return nullptr;
 
-		//counting the no. of items in the list
-		
-		Node<T>* p = Head;
-		while (p)
-		{
-			count++;
-			p = p->getNext();
-		}
+		Node<T>* p;
 		T* Arr = new T[count];
 		p = Head;
 		for (int i = 0; i < count; i++)
@@ -158,6 +158,16 @@ public:
 			ptr = ptr->getNext();
 		}
 		return false;
+	}
+
+	void Sort()
+	{
+
+	}
+	
+	int GetCount()
+	{
+		return count;
 	}
 };
 #endif	
