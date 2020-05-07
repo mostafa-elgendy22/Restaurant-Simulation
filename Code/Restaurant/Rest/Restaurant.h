@@ -23,12 +23,12 @@ private:
 	Queue<Event*> EventsQueue;	   //Queue of all events that will be loaded from file
 	ServeOrder* pServ;
 
-	PriorityQueue<VipOrder*> VipOrders;
-	LinkedList<NormalOrder*> NormalOrders;
+	PriorityQueue<VipOrder*,float> VipOrders;
+	LinkedList<NormalOrder*,int> NormalOrders;
 	Queue<VeganOrder*> VeganOrders;
 
-	LinkedList<Order*>InServiceOrders;
-	LinkedList<Order*>FinishedOrders;
+	LinkedList<Order*,int>InServiceOrders;
+	LinkedList<Order*,int>FinishedOrders;
 
 	Queue<Cook*>NormalCooks;
 	Queue<Cook*>VeganCooks;
@@ -42,13 +42,20 @@ private:
 	int NumVeganCooks;         //number of vegan cooks
 	int NumVipCooks;          //number of vip cooks
 
-	int EventsNumber;
 	int currentTimeStep;
 	int NumAutoPromoted;
 
-	int NormalNum;          //number of normal orders
-	int VeganNum;           //number of vegan orders
-	int VipNum;           //number of vip orders
+	int NumNormalOrders;         //number of normal orders
+	int NumVeganOrders;          //number of vegan orders
+	int NumVipOrders;           //number of vip orders
+
+	int maxNumCooks; //number of orders a cook must prepare before taking a break
+	int Vip_WT;
+	float InjProb;
+	int RstPrd;
+	int NumUrgentOrders;
+	int NumInjuredCooks;
+
 
 public:
 
@@ -60,17 +67,13 @@ public:
 
 	void RunSimulation();
 
-	void CancelOrder(int r_ID);
+	NormalOrder*& GetNormalOrderFromID(int ID);
 
-	void PromoteOrder(int Oid);         //to be implemented in phase 2
+	void CancelOrder(int ID);
+
+	void PromoteOrder(int ID);       
 
 	void FillDrawingList();
-
-	int GetNumNormal();
-
-	int GetNumVegan();
-	
-	int GetNumVip();
 
 	void ReadFile();
 
@@ -82,7 +85,7 @@ public:
 
 	void AddToVipList(VipOrder* po);
 
-	void RunInteractive();               //for simulation
+	void RunInteractive();             
 
 	void RunStepByStep();            
 

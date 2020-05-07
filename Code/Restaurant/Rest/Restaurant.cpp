@@ -15,7 +15,7 @@ Restaurant::Restaurant()
 	pServ = NULL;
 	currentTimeStep = 0;
 	NumAutoPromoted = 0;
-	NormalNum = VeganNum = VipNum = 0;
+	NumNormalOrders = NumVeganOrders = NumVipOrders = 0;
 }
 
 
@@ -29,15 +29,18 @@ void Restaurant::RunSimulation()
 	case MODE_INTR:
 		ReadFile();
 		RunInteractive();
+		PrintFile();
 		break;
 
 	case MODE_STEP:
 		ReadFile();
 		RunStepByStep();
+		PrintFile();
 		break;
 
 	case MODE_SLNT:
 		ReadFile();
+		//simulation function call here
 		PrintFile();
 		break;
 	};
@@ -84,6 +87,7 @@ Restaurant::~Restaurant()
 	if (pGUI)
 	{
 		delete pGUI;
+		pGUI = nullptr;
 	}
 }
 
@@ -96,14 +100,14 @@ void Restaurant::FillDrawingList()
 
 	timestep += to_string(currentTimeStep);
 
-	int orders;
-	Order** ord = FinishedOrders.toArray(orders);
+	int orders = FinishedOrders.GetLength();
+	Order** ord = FinishedOrders.toArray();
 	for (int i = 0; i < orders; i++)
 	{
 		pGUI->AddToDrawingList(ord[i]);
 	}
 
-	ord = InServiceOrders.toArray(orders);
+	ord = InServiceOrders.toArray();
 	int inser = orders;
 	for (int i = 0; i < orders; i++)
 	{
@@ -111,7 +115,7 @@ void Restaurant::FillDrawingList()
 	}
 
 	NormalOrder** pNorm;
-	pNorm = NormalOrders.toArray(orders);
+	pNorm = NormalOrders.toArray();
 	int normnum = orders;
 	for (int i = 0; i < orders; i++)
 	{
@@ -172,55 +176,59 @@ void Restaurant::FillDrawingList()
 void Restaurant::AddToNormalList(NormalOrder* po)
 {
 	NormalOrders.InsertEnd(po);
-	NormalNum++;
+	NumNormalOrders++;
 }
+
 void Restaurant::AddToVeganList(VeganOrder* po)
 {
 	VeganOrders.enqueue(po);
-	VeganNum++;
+	NumVeganOrders++;
 }
+
 void Restaurant::AddToVipList(VipOrder* po)
 {
-	VipOrders.enqueue(po);
-	VipNum++;
+	VipOrders.enqueue(po, 6.5);
+	NumVipOrders++;
 }
 
-void Restaurant::CancelOrder(int r_ID)
+NormalOrder*& Restaurant::GetNormalOrderFromID(int ID)
 {
-	NormalOrders.DeleteByID(r_ID);
-	NormalNum--;
+	NormalOrder* ord = nullptr;
+	NormalOrders.GetEntry(ord, ID);
+	return ord;
 }
 
-void Restaurant::PromoteOrder(int Oid)
+void Restaurant::CancelOrder(int ID)
 {
-
-	NormalNum--;
-	VipNum++;
-	NumAutoPromoted++;
+	if (NormalOrders.Delete(GetNormalOrderFromID(ID)))
+	{
+		NumNormalOrders--;
+	}
 }
 
-int Restaurant::GetNumNormal()
+
+void Restaurant::PromoteOrder(int ID)
 {
-	return NumNormalCooks;
+	NormalOrder* pOrd = GetNormalOrderFromID(ID);
+	if (pOrd)
+	{
+		VipOrder* order = new VipOrder(pOrd);
+		NormalOrders.Delete(pOrd);
+		VipOrders.enqueue(order, order->GetPriorityFactor());
+		NumNormalOrders--;
+		NumVipOrders++;
+		NumAutoPromoted++;
+	}
 }
 
-int Restaurant::GetNumVegan()
-{
-	return NumVeganCooks;
-}
-
-int Restaurant::GetNumVip()
-{
-	return NumVipCooks;
-}
 
 void Restaurant::ReadFile()
 {
 	ifstream inputFile;
 	string fileName = "../../Input Files/";
 	string temp;
-	int AutoPromote, NormalSpeed, VeganSpeed, VipSpeed, maxNumOrders, NormalBreak, VeganBreak, VipBreak;
-
+	int AutoPromote, NormalSpeed[2], VeganSpeed[2], VipSpeed[2], maxNumOrders, NormalBreak[2], VeganBreak[2], VipBreak[2];
+	int EventsNumber;
 	pGUI->PrintMessage("Enter the name of the input file : ");
 	temp = pGUI->GetString();
 	temp += ".txt";
@@ -229,27 +237,41 @@ void Restaurant::ReadFile()
 
 
 	inputFile >> NumNormalCooks >> NumVeganCooks >> NumVipCooks;
-	inputFile >> NormalSpeed >> VeganSpeed >> VipSpeed;
-	inputFile >> maxNumOrders >> NormalBreak >> VeganBreak >> VipBreak;
-	inputFile >> AutoPromote;
+	inputFile >> NormalSpeed[0] >> NormalSpeed[1];
+	inputFile >> VeganSpeed[0] >> VeganSpeed[1];
+	inputFile >> VipSpeed[0] >> VipSpeed[1];
+	inputFile >> maxNumOrders;
+	inputFile >> NormalBreak[0] >> NormalBreak[1];
+	inputFile >> VeganBreak[0] >> VeganBreak[1];
+	inputFile >> VipBreak[0] >> VipBreak[1];
+	inputFile >> InjProb >> RstPrd;
+	inputFile >> AutoPromote >> Vip_WT;
 	inputFile >> EventsNumber;
 
+
+	srand((int)time(NULL));
 	for (int i = 0; i < NumNormalCooks; i++)
 	{
-		Cook* c = new Cook(i + 1, TYPE_NRM, NormalSpeed, maxNumOrders, NormalBreak);
-		NormalCooks.enqueue(c);
+		int speed = NormalSpeed[0] + rand() % NormalSpeed[1];
+		int Break = NormalBreak[0] + rand() % NormalBreak[1];
+		Cook* pCook = new Cook(i + 1, TYPE_NRM, speed, Break);
+		NormalCooks.enqueue(pCook);
 	}
 
 	for (int i = 0; i < NumVeganCooks; i++)
 	{
-		Cook* c = new Cook(i + 1 + NumNormalCooks, TYPE_VGAN, VeganSpeed, maxNumOrders, VeganBreak);
-		VeganCooks.enqueue(c);
+		int speed = VeganSpeed[0] + rand() % VeganSpeed[1];
+		int Break = VeganBreak[0] + rand() % VeganBreak[1];
+		Cook* pCook = new Cook(i + 1 + NumNormalCooks, TYPE_VGAN, speed, Break);
+		VeganCooks.enqueue(pCook);
 	}
 
 	for (int i = 0; i < NumVipCooks; i++)
 	{
-		Cook* c = new Cook(i + 1 + NumNormalCooks + NumVeganCooks, TYPE_VIP, VipSpeed, maxNumOrders, VipBreak);
-		VipCooks.enqueue(c);
+		int speed = VipSpeed[0] + rand() % VipSpeed[1];
+		int Break = VipBreak[0] + rand() % VipBreak[1];
+		Cook* pCook = new Cook(i + 1 + NumNormalCooks + NumVeganCooks, TYPE_VIP, speed, Break);
+		VipCooks.enqueue(pCook);
 	}
 
 	//Reading Events
@@ -320,7 +342,7 @@ void Restaurant::PrintFile()
 	float WT_Sum = 0;
 	float ST_Sum = 0;
 
-	for (int i = 0; i < FinishedOrders.GetCount(); i++)
+	for (int i = 0; i < FinishedOrders.GetLength(); i++)
 	{
 		Order* pOrd;
 		FinishedOrders.head(pOrd);
@@ -331,12 +353,14 @@ void Restaurant::PrintFile()
 		ST_Sum += pOrd->GetST();
 	}
 
-	OutputFile << "Orders: " << NormalNum + VeganNum + VipNum;
-	OutputFile << " [Norm:" << NormalNum << ", Veg:" << VeganNum << ", VIP:" << VipNum << "]" << "\n";
+	OutputFile << "Orders: " << NumNormalOrders + NumVeganOrders + NumVipOrders;
+	OutputFile << " [Norm:" << NumNormalOrders << ", Veg:" << NumVeganOrders << ", VIP:" << NumVipOrders << "]" << "\n";
 	OutputFile << "Cooks: " << NumNormalCooks + NumVipCooks + NumVeganCooks;
-	OutputFile << " [Norm:" << NumNormalCooks << ", Veg:" << NumVeganCooks << ", VIP:" << NumVipCooks << "]" << "\n";
+	OutputFile << " [Norm:" << NumNormalCooks << ", Veg:" << NumVeganCooks;
+	OutputFile << ", VIP:" << NumVipCooks << ", injured: " << NumInjuredCooks << "]" << "\n";
 	OutputFile << "Avg Wait = " << "" << ",  Avg Serv = " << "" << "\n";
-	OutputFile << "Auto - promoted: " << NumAutoPromoted;
+	OutputFile << "Urgent orders: " << NumUrgentOrders << ",   ";
+	OutputFile << "Auto - promoted: " << (float(NumAutoPromoted) / NumNormalOrders) * 100 << " %";
 	OutputFile.close();
 }
 

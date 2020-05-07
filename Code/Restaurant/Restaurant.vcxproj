@@ -105,10 +105,12 @@
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="NormalOrder.h" />
     <ClInclude Include="PriorityQueue.h" />
+    <ClInclude Include="PriorityQueueNode.h" />
     <ClInclude Include="PromotionEvent.h" />
     <ClInclude Include="Rest\Cook.h" />
     <ClInclude Include="Rest\Order.h" />
     <ClInclude Include="Rest\Restaurant.h" />
+    <ClInclude Include="ServeOrder.h" />
     <ClInclude Include="VeganOrder.h" />
     <ClInclude Include="VipOrder.h" />
   </ItemGroup>
@@ -158,6 +160,7 @@
     <ClCompile Include="Rest\Cook.cpp" />
     <ClCompile Include="Rest\Order.cpp" />
     <ClCompile Include="Rest\Restaurant.cpp" />
+    <ClCompile Include="ServeOrder.cpp" />
     <ClCompile Include="VeganOrder.cpp" />
     <ClCompile Include="VipOrder.cpp" />
   </ItemGroup>

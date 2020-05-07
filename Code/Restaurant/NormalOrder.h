@@ -5,6 +5,6 @@ class NormalOrder : public Order
 	int AutoPromote;
 
 public:
-	NormalOrder(int ID, ORD_TYPE type, int size, int time, double money, int autoP);
+	NormalOrder(int ID, int size, int time, double money, int autoP);
 };
 

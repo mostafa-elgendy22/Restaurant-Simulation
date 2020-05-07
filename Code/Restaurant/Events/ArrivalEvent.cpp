@@ -2,7 +2,7 @@
 #include "..\Rest\Restaurant.h"
 
 
-ArrivalEvent::ArrivalEvent(int eTime, int oID, ORD_TYPE oType, double oMoney, int size,int autoP) :Event(eTime, oID)
+ArrivalEvent::ArrivalEvent(int eTime, int oID, ORD_TYPE oType, double oMoney, int size, int autoP) :Event(eTime, oID)
 {
 	OrdType = oType;
 	OrdMoney = oMoney;
@@ -20,17 +20,17 @@ void ArrivalEvent::Execute(Restaurant* pRest)
 
 
 	case TYPE_NRM:
-		 ord1 = new NormalOrder(OrderID, OrdType, OrdSize, EventTime, OrdMoney,autoP);
+		ord1 = new NormalOrder(OrderID, OrdSize, EventTime, OrdMoney, autoP);
 		pRest->AddToNormalList(ord1);
 		break;
 
 	case TYPE_VIP:
-		 ord2 = new VipOrder(OrderID, OrdType, OrdSize, EventTime, OrdMoney);
+		ord2 = new VipOrder(OrderID,  OrdSize, EventTime, OrdMoney);
 		pRest->AddToVipList(ord2);
 		break;
 
 	case TYPE_VGAN:
-		 ord3 =new VeganOrder(OrderID, OrdType, OrdSize, EventTime, OrdMoney);
+		ord3 = new VeganOrder(OrderID, OrdSize, EventTime, OrdMoney);
 		pRest->AddToVeganList(ord3);
 		break;
 	}

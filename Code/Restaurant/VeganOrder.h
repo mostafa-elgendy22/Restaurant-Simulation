@@ -4,6 +4,6 @@ class VeganOrder : public Order
 {
 
 public:
-	VeganOrder(int ID, ORD_TYPE type, int size, int time, double money);
+	VeganOrder(int ID, int size, int time, double money);
 };
 

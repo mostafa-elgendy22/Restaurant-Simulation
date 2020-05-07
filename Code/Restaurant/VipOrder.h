@@ -1,12 +1,18 @@
 #pragma once
 #include "Rest/Order.h"
+#include "NormalOrder.h"
+
 class VipOrder : public Order
 {
 	float PriorityFactor;
 
 public:
-	VipOrder(int ID, ORD_TYPE type, int size, int time, double money);
+	VipOrder(int ID, int size, int time, double money);
+
+	VipOrder(NormalOrder* ord);
 
 	void CalculatePriorityFactor();
+
+	float GetPriorityFactor();
 };
 

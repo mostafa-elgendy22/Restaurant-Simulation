@@ -7,16 +7,16 @@
 template <typename T>
 class Queue
 {
-private :
-	
-	Node<T>* backPtr;
-	Node<T>* frontPtr;
+private:
 
-public :
-	Queue();	
-	bool isEmpty() const ;
+	Node<T>* Front;
+	Node<T>* Back;
+
+public:
+	Queue();
+	bool isEmpty() const;
 	bool enqueue(const T& newEntry);
-	bool dequeue(T& frntEntry);  
+	bool dequeue(T& frntEntry);
 	bool peekFront(T& frntEntry)  const;
 	T* toArray(int& count);	//returns array of T (array of items)
 	~Queue();
@@ -25,61 +25,59 @@ public :
 template <typename T>
 Queue<T>::Queue()
 {
-	backPtr=nullptr;
-	frontPtr=nullptr;
+	Front = Back = nullptr;
 }
 
 
 template <typename T>
 bool Queue<T>::isEmpty() const
 {
-	return frontPtr == nullptr;
+	return Front == nullptr;
 }
 
 
 template <typename T>
-bool Queue<T>::enqueue( const T& newEntry)
+bool Queue<T>::enqueue(const T& newEntry)
 {
 	Node<T>* newNodePtr = new Node<T>(newEntry);
-	// Insert the new node
+
 	if (isEmpty())
-		frontPtr = newNodePtr; // The queue is empty
+		Front = newNodePtr;
 	else
-		backPtr->setNext(newNodePtr); // The queue was not empty
-	backPtr = newNodePtr; // New node is at back
+		Back->setNext(newNodePtr);
+	Back = newNodePtr;
 	return true;
-} 
+}
 
 
 
 template <typename T>
-bool Queue<T>:: dequeue(T& frntEntry)  
+bool Queue<T>::dequeue(T& frntEntry)
 {
-	if(isEmpty())
+	if (isEmpty())
 		return false;
 
-	Node<T>* nodeToDeletePtr = frontPtr;
-	frntEntry = frontPtr->getItem();
-	frontPtr = frontPtr->getNext();
-	// Queue is not empty; remove front
-	if (nodeToDeletePtr == backPtr)	 // Special case: one node in queue
-		backPtr = nullptr ;	
-		
-	// Free memory reserved by the dequeued node
+	Node<T>* nodeToDeletePtr = Front;
+	frntEntry = Front->getItem();
+	Front = Front->getNext();
+
+	if (nodeToDeletePtr == Back)
+		Back = nullptr;
+
+
 	delete nodeToDeletePtr;
-
-
+	nodeToDeletePtr = nullptr;
 	return true;
 }
 
 
 template <typename T>
-bool Queue<T>:: peekFront(T& frntEntry) const 
+bool Queue<T>::peekFront(T& frntEntry) const
 {
-	if(isEmpty())
+	if (isEmpty())
 		return false;
 
-	frntEntry = frontPtr->getItem();
+	frntEntry = Front->getItem();
 	return true;
 }
 
@@ -93,22 +91,22 @@ Queue<T>::~Queue()
 template <typename T>
 T* Queue<T>::toArray(int& count)
 {
-	count=0;
+	count = 0;
 
-	if(!frontPtr)
+	if (!Front)
 		return nullptr;
 	//counting the no. of items in the Queue
-	Node<T>* p = frontPtr;
-	while(p)
+	Node<T>* p = Front;
+	while (p)
 	{
 		count++;
 		p = p->getNext();
 	}
 
 
-	T* Arr= new T[count];
-	p = frontPtr;
-	for(int i=0; i<count;i++)
+	T* Arr = new T[count];
+	p = Front;
+	for (int i = 0; i < count; i++)
 	{
 		Arr[i] = p->getItem();
 		p = p->getNext();

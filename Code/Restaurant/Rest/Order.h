@@ -44,11 +44,17 @@ public:
 
 	bool operator > (const Order& x) const;
 
+	bool operator == (const Order*& ord);
+
+	operator int() const;
+
 	int GetAT();
 	
 	int GetST();
 
 	int GetFT();
+
+	double GetMoney();
 };
 
 #endif

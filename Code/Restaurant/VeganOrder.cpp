@@ -1,7 +1,7 @@
 #include "VeganOrder.h"
 
-VeganOrder::VeganOrder(int ID, ORD_TYPE type, int size, int time, double money) : 
-	Order(ID, type, size, time, money)
+VeganOrder::VeganOrder(int ID, int size, int time, double money) : 
+	Order(ID,TYPE_VGAN, size, time, money)
 {
 
 }

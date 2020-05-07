@@ -4,170 +4,195 @@
 #include "Generic_DS/Node.h"
 
 
-template <typename T>
+template <class T, class K = T>    // K is for searching using a key value
 class LinkedList
 {
 private:
+
 	Node<T>* Head;	//Pointer to the head of the list
 
 	Node<T>* Back;  //Pointer to the back of the list
 
-	int count;
+	int count;     //Number of the elements of the list
+
 public:
 
-	LinkedList()
+	LinkedList();
+	~LinkedList();
+	bool isEmpty();
+	int GetLength();
+	void InsertEnd(const T& data);
+	void Clear();
+	bool Delete(T& item);
+	bool head(T& frontEntry);
+	T* toArray();
+	bool GetEntry(T& item,K key);
+	void Sort();
+};
+#endif	
+
+
+template<class T, class K>
+LinkedList<T, K>::LinkedList()
+{
+	Head = nullptr;
+	Back = nullptr;
+	count = 0;
+}
+
+template<class T, class K>
+LinkedList<T, K>::~LinkedList()
+{
+	Clear();
+}
+
+template<class T, class K>
+bool LinkedList<T, K>::isEmpty()
+{
+	return count == 0;
+}
+
+template<class T, class K>
+void LinkedList<T, K>::InsertEnd(const T& data)
+{
+	Node<T>* ptr = new Node<T>(data);
+
+	if (!Head)
 	{
-		Head = nullptr;
-		Back = nullptr;
-		count = 0;
+		Head = ptr;
+		Back = Head;
+		Head->setNext(nullptr);
+		count++;
+		return;
 	}
-
-	~LinkedList()
+	if (Head == Back)
 	{
-		DeleteAll();
-	}
-
-	bool isEmpty()
-	{
-		return count == 0;
-	}
-
-	void InsertEnd(const T& data)
-	{
-		Node<T>* ptr = new Node<T>(data);
-
-		if (!Head)
-		{
-			Head = ptr;
-			Back = Head;
-			Head->setNext(nullptr);
-			count++;
-			return;
-		}
-		if (Head == Back)
-		{
-			Head->setNext(ptr);
-			Back = ptr;
-			count++;
-			return;
-		}
-		Back->setNext(ptr);
+		Head->setNext(ptr);
 		Back = ptr;
 		count++;
+		return;
 	}
+	Back->setNext(ptr);
+	Back = ptr;
+	count++;
+}
 
-
-	void DeleteAll()
+template<class T, class K>
+void LinkedList<T, K>::Clear()
+{
+	Node<T>* P = Head;
+	while (Head)
 	{
-		Node<T>* P = Head;
-		while (Head)
-		{
-			P = Head->getNext();
-			delete Head;
-			Head = P;
-		}
-		count = 0;
+		P = Head->getNext();
+		delete Head;
+		Head = P;
 	}
+	count = 0;
+}
 
-	void DeleteByID(int ID)
+template<class T, class K>
+bool LinkedList<T, K>::Delete(T& item)
+{
+	if (!Head)
+		return false;
+
+	Node<T>* todelete;
+
+	if (Head->getItem() == item)
 	{
-		if (!Head)
-			return;
-
-		Node<T>* todelete;
-
-		if (Head->getItem()->GetID() == ID)
-		{
-			todelete = Head;
-			Head = Head->getNext();
-			delete todelete;
-			count--;
-			return;
-		}
-
-		Node<T>* ptr = Head;
-
-		while (ptr->getNext())
-		{
-			if (ptr->getNext()->getItem()->GetID() == ID)
-			{
-				todelete = ptr->getNext();
-				ptr = ptr->getNext()->getNext();
-				delete todelete;
-				count--;
-				return;
-			}
-		}
-		todelete = nullptr;
-	}
-
-	bool head(T& frntEntry)  //to get the head
-	{
-		if (isEmpty())
-			return false;
-
-		Node<T>* nodeToDeletePtr = Head;
-		frntEntry = Head->getItem();
+		todelete = Head;
 		Head = Head->getNext();
-		delete nodeToDeletePtr;
+		delete todelete;
+		todelete = nullptr;
+		count--;
 		return true;
-
 	}
 
-	T* toArray(int& count)
+	Node<T>* ptr = Head->getNext();
+
+	while (ptr)
 	{
-
-		if (!Head)
-			return nullptr;
-
-		Node<T>* p;
-		T* Arr = new T[count];
-		p = Head;
-		for (int i = 0; i < count; i++)
+		if (ptr->getItem() == item)
 		{
-			Arr[i] = p->getItem();
-			p = p->getNext();
+			todelete = ptr->getNext();
+			ptr = ptr->getNext()->getNext();
+			delete todelete;
+			todelete = nullptr;
+			count--;
+			return true;
 		}
-		return Arr;
 	}
+	return false;
+}
 
-	bool SearchByID(int ID, T& entry) //to get orders by their id
+template<class T, class K>
+bool LinkedList<T,K>::head(T& frontEntry)  //to get the head
+{
+	if (isEmpty())
+		return false;
+
+	Node<T>* nodeToDeletePtr = Head;
+	frontEntry = Head->getItem();
+	Head = Head->getNext();
+	delete nodeToDeletePtr;
+	return true;
+
+}
+
+template<class T,class K>
+T* LinkedList<T,K>::toArray()
+{
+
+	if (!Head)
+		return nullptr;
+
+	Node<T>* p;
+	T* Arr = new T[count];
+	p = Head;
+	for (int i = 0; i < count; i++)
 	{
-		if (Head && Head->getID() == ID)
-		{
-			entry = Head->getItem();
-			return true;
-		}
-		if (Back && Back->getID() == ID)
-		{
-			entry = Back->getItem();
-			return true;
-		}
-		Node<T>* ptr;
-		if (Head)
-		{
-			ptr = Head->getNext();
-		}
-		while (ptr)
-		{
-			if (ptr->getID() == ID)
-			{
-				entry = ptr->getItem();
-				return true;
-			}
-			ptr = ptr->getNext();
-		}
+		Arr[i] = p->getItem();
+		p = p->getNext();
+	}
+	return Arr;
+}
+
+
+
+template<class T,class K>
+void LinkedList<T, K>::Sort()
+{
+
+}
+
+template<class T,class K>
+int LinkedList<T, K>::GetLength()
+{
+	return count;
+}
+
+template<class T,class K>
+bool LinkedList<T, K>::GetEntry(T& item, K key)
+{
+	if (!Head)
+	{
 		return false;
 	}
 
-	void Sort()
+	if (K(Head->getItem()) == key)
 	{
-
+		item = Head->getItem();
+		return true;
 	}
-	
-	int GetCount()
+	Node<T>* ptr = Head->getNext();
+	while (ptr)
 	{
-		return count;
+		if (K(ptr->getItem()) == key)
+		{
+			item = ptr->getItem();
+			return true;
+		}
+		ptr = ptr->getNext();
 	}
-};
-#endif	
+	return false;
+}

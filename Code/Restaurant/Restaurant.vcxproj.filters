@@ -129,6 +129,12 @@
     <ClInclude Include="VipOrder.h">
       <Filter>Restaurant</Filter>
     </ClInclude>
+    <ClInclude Include="ServeOrder.h">
+      <Filter>Restaurant</Filter>
+    </ClInclude>
+    <ClInclude Include="PriorityQueueNode.h">
+      <Filter>Generic_DS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CMUgraphicsLib\jpeg\jcomapi.c">
@@ -268,6 +274,9 @@
       <Filter>Restaurant</Filter>
     </ClCompile>
     <ClCompile Include="VipOrder.cpp">
+      <Filter>Restaurant</Filter>
+    </ClCompile>
+    <ClCompile Include="ServeOrder.cpp">
       <Filter>Restaurant</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,19 +1,20 @@
 #pragma once
 
-#include"Generic_DS/Node.h"
+#include"PriorityQueueNode.h"
 
 
-template<typename T>
+template<typename T, typename K>
 class PriorityQueue
 {
 private:
 
-	Node<T>* backPtr;
+	PriorityQueueNode<T, K>* Front;
 
 public:
+
 	PriorityQueue();
 	bool isEmpty() const;
-	virtual bool enqueue(const T& newEntry);
+	bool enqueue(const T& newEntry, K priority_key);
 	bool dequeue(T& frntEntry);
 	bool peekFront(T& frntEntry)  const;
 	T* toArray(int& count);	//returns array of T (array of items)
@@ -22,118 +23,113 @@ public:
 
 
 
-template<typename T>
-PriorityQueue<T>::PriorityQueue()
+template<typename T, typename K>
+PriorityQueue<T, K>::PriorityQueue()
 {
-	backPtr = nullptr;
+	Front = nullptr;
 }
 
-template<typename T>
-bool PriorityQueue<T>::isEmpty() const
+template<typename T, typename K>
+bool PriorityQueue<T, K>::isEmpty() const
 {
-	return backPtr == nullptr;
+	return Front == nullptr;
 }
 
-template<typename T>
-bool PriorityQueue<T>::enqueue(const T& newEntry)
+template<typename T, typename K>
+bool PriorityQueue<T, K>::enqueue(const T& newEntry, K priority_key)
 {
-	Node<T>* newnode = new Node<T>(newEntry);
+	PriorityQueueNode<T, K>* newnode = new PriorityQueueNode<T, K>(newEntry, priority_key);
 
-	if(backPtr==nullptr)
+	if (Front == nullptr)
 	{
-		backPtr = newnode;
-		backPtr->setNext(newnode);
+		Front = newnode;
 		return true;
 	}
-	
-	
-	Node<T>* prev = backPtr;
-	Node<T>* ptr = backPtr->getNext();
 
-	while (ptr != backPtr)
+
+	if (newnode->getPriority() > Front->getPriority())
 	{
-		if (*(newnode->getItem()) >*(ptr->getItem()))
+		newnode->setNext(Front);
+		Front = newnode;
+		return true;
+	}
+
+	PriorityQueueNode<T, K>* ptr = Front->getNext();
+	PriorityQueueNode<T, K>* prev = Front;
+	while (ptr)
+	{
+		if (ptr->getPriority() < newnode->getPriority())
 		{
-			prev->setNext(newnode);
 			newnode->setNext(ptr);
+			prev->setNext(newnode);
 			return true;
 		}
-		prev = ptr;
 		ptr = ptr->getNext();
+		prev = prev->getNext();
 	}
-
-	if (*(newnode->getItem())> *(backPtr->getItem()))
-	{
-		prev->setNext(newnode);
-		newnode->setNext(backPtr);
-	}
-	else
-	{	
-		newnode->setNext(backPtr->getNext());
-		backPtr->setNext(newnode);
-		backPtr = newnode;
-	}
-
-	
+	prev->setNext(newnode);  //if the new node has the least priority
 	return true;
 }
 
 
-template<typename T>
-bool PriorityQueue<T>::dequeue(T& frntEntry)
-{
-	if (isEmpty())return false;
-
-	Node<T>* nodeToDeletePtr = backPtr->getNext();
-	frntEntry = backPtr->getNext()->getItem();
-	backPtr->setNext(nodeToDeletePtr->getNext());
-
-	if (backPtr == nodeToDeletePtr)
-		backPtr = nullptr;
-
-	//delete nodeToDeletePtr;
-
-	return true;
-}
-
-template<typename T>
-bool PriorityQueue<T>::peekFront(T& frntEntry)  const
+template<typename T, typename K>
+bool PriorityQueue<T, K>::dequeue(T& frontEntry)
 {
 	if (isEmpty())
 		return false;
 
-	frntEntry = backPtr->getItem();
+	PriorityQueueNode<T, K>* nodeToDeletePtr = Front;
+	frontEntry = Front->getItem();
+	Front = Front->getNext();
+
+	delete nodeToDeletePtr;
+
+	return true;
+}
+
+template<typename T, typename K>
+bool PriorityQueue<T, K>::peekFront(T& frontEntry)  const
+{
+	if (isEmpty())
+		return false;
+
+	frontEntry = Front->getItem();
 	return true;
 }
 
 
 
-template<typename T>
-PriorityQueue<T>::~PriorityQueue()
+template<typename T, typename K>
+PriorityQueue<T, K>::~PriorityQueue()
 {
-	
+	while (Front)
+	{
+		PriorityQueueNode<T, K>* temp = Front;
+		Front = Front->getNext();
+		delete temp;
+	}
 }
 
 
-template <typename T>
-T* PriorityQueue<T>::toArray(int& count)
+template <typename T, typename K>
+T* PriorityQueue<T, K>::toArray(int& count)
 {
 	count = 0;
 
-	if (!backPtr)
+	if (!Front)
 		return nullptr;
 	//counting the no. of items in the Queue
-	Node<T>* p = backPtr->getNext();
-	Node<T>* e = p;
+	PriorityQueueNode<T, K>* p = Front;
+	PriorityQueueNode<T, K>* e = p;
 	do
 	{
 		count++;
 		p = p->getNext();
-	}while ((p != e));
+	} while ((p != e));
 
 
 	T* Arr = new T[count];
-	p = backPtr->getNext();
+	p = Front;
 	for (int i = 0; i < count; i++)
 	{
 		Arr[i] = p->getItem();

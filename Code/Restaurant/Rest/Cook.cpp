@@ -1,12 +1,11 @@
 #include "Cook.h"
 
 
-Cook::Cook(int r_id, ORD_TYPE r_type, int r_speed, int max, int Break)
+Cook::Cook(int r_id, ORD_TYPE r_type, int r_speed, int Break)
 {
 	ID = r_id;
 	type = r_type;
 	speed = r_speed;
-	maxNumCooks = max;
 	BreakDuration = Break;
 }
 
@@ -40,4 +39,9 @@ void Cook::setType(ORD_TYPE t)
 int Cook::GetSpeed() const
 {
 	return speed;
+}
+
+void Cook::HalfSpeed()
+{
+	speed = speed / 2;
 }
