@@ -56,7 +56,7 @@ OrderService::operator int()
 
 OrderService::operator bool()
 {
-	return cook->IsInjured();
+	return !cook->IsInjured();
 }
 
 Order* OrderService::GetOrder()
