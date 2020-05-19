@@ -24,9 +24,9 @@ public:
 	void InsertEnd(const T& data);
 	void Clear();
 	bool Delete(T& item);
-	bool head(T& frontEntry);
+	bool peekHead(T& frontEntry);
 	T* toArray();
-	bool GetEntry(T& item,K key);
+	bool GetEntry(T& item, K key);
 	void Sort();
 };
 #endif	
@@ -65,13 +65,7 @@ void LinkedList<T, K>::InsertEnd(const T& data)
 		count++;
 		return;
 	}
-	if (Head == Back)
-	{
-		Head->setNext(ptr);
-		Back = ptr;
-		count++;
-		return;
-	}
+
 	Back->setNext(ptr);
 	Back = ptr;
 	count++;
@@ -88,6 +82,7 @@ void LinkedList<T, K>::Clear()
 		Head = P;
 	}
 	count = 0;
+	Head = Back = nullptr;
 }
 
 template<class T, class K>
@@ -108,41 +103,38 @@ bool LinkedList<T, K>::Delete(T& item)
 		return true;
 	}
 
-	Node<T>* ptr = Head->getNext();
-
+	Node<T>* ptr = Head;
+	todelete = Head->getNext();
 	while (ptr)
 	{
 		if (ptr->getItem() == item)
 		{
-			todelete = ptr->getNext();
-			ptr = ptr->getNext()->getNext();
+			ptr->setNext(todelete->getNext());
 			delete todelete;
 			todelete = nullptr;
 			count--;
 			return true;
 		}
+		ptr = ptr->getNext();
+		todelete = todelete->getNext();
 	}
 	return false;
 }
 
 template<class T, class K>
-bool LinkedList<T,K>::head(T& frontEntry)  //to get the head
+bool LinkedList<T, K>::peekHead(T& frontEntry)  //to get the head
 {
 	if (isEmpty())
 		return false;
 
-	Node<T>* nodeToDeletePtr = Head;
 	frontEntry = Head->getItem();
-	Head = Head->getNext();
-	delete nodeToDeletePtr;
 	return true;
 
 }
 
-template<class T,class K>
-T* LinkedList<T,K>::toArray()
+template<class T, class K>
+T* LinkedList<T, K>::toArray()
 {
-
 	if (!Head)
 		return nullptr;
 
@@ -159,19 +151,19 @@ T* LinkedList<T,K>::toArray()
 
 
 
-template<class T,class K>
+template<class T, class K>
 void LinkedList<T, K>::Sort()
 {
 
 }
 
-template<class T,class K>
+template<class T, class K>
 int LinkedList<T, K>::GetLength()
 {
 	return count;
 }
 
-template<class T,class K>
+template<class T, class K>
 bool LinkedList<T, K>::GetEntry(T& item, K key)
 {
 	if (!Head)
@@ -179,7 +171,8 @@ bool LinkedList<T, K>::GetEntry(T& item, K key)
 		return false;
 	}
 
-	if (K(Head->getItem()) == key)
+	K search_key = *(Head->getItem());
+	if (search_key == key)
 	{
 		item = Head->getItem();
 		return true;
@@ -187,7 +180,8 @@ bool LinkedList<T, K>::GetEntry(T& item, K key)
 	Node<T>* ptr = Head->getNext();
 	while (ptr)
 	{
-		if (K(ptr->getItem()) == key)
+		search_key = *(ptr->getItem());
+		if (search_key == key)
 		{
 			item = ptr->getItem();
 			return true;

@@ -7,6 +7,8 @@ Cook::Cook(int r_id, ORD_TYPE r_type, int r_speed, int Break)
 	type = r_type;
 	speed = r_speed;
 	BreakDuration = Break;
+	ServicedOrders = 0;
+	isInjured = false;
 }
 
 Cook::~Cook()
@@ -44,4 +46,47 @@ int Cook::GetSpeed() const
 void Cook::HalfSpeed()
 {
 	speed = speed / 2;
+}
+
+void Cook::DoubleSpeed()
+{
+	speed = speed * 2;
+}
+
+void Cook::IncrementServicedOrders()
+{
+	ServicedOrders++;
+}
+
+int Cook::GetServicedOrders()
+{
+	return ServicedOrders;
+}
+
+void Cook::ResetServicedOrders()
+{
+	ServicedOrders = 0;
+}
+
+int Cook::GetStartBreakTime()
+{
+	return StartBreakTime;
+}
+void Cook::SetStartBreakTime(int time)
+{
+	StartBreakTime = time;
+}
+
+void Cook::SetInjury(bool flag)
+{
+	isInjured = flag;
+}
+bool Cook::IsInjured()
+{
+	return isInjured;
+}
+
+Cook::operator int()
+{
+	return (StartBreakTime + BreakDuration);
 }

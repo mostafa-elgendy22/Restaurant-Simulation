@@ -5,14 +5,20 @@
 class VipOrder : public Order
 {
 	float PriorityFactor;
+	bool isUrgent;
+
+
+	void CalculatePriorityFactor();
 
 public:
 	VipOrder(int ID, int size, int time, double money);
 
 	VipOrder(NormalOrder* ord);
 
-	void CalculatePriorityFactor();
-
 	float GetPriorityFactor();
+
+	bool IsUrgent();
+
+	bool operator > (VipOrder* ord);
 };
 

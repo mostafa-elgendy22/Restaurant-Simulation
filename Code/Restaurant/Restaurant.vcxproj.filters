@@ -129,11 +129,17 @@
     <ClInclude Include="VipOrder.h">
       <Filter>Restaurant</Filter>
     </ClInclude>
-    <ClInclude Include="ServeOrder.h">
+    <ClInclude Include="BinaryTreeNode.h">
+      <Filter>Generic_DS</Filter>
+    </ClInclude>
+    <ClInclude Include="BinarySearchTree.h">
+      <Filter>Generic_DS</Filter>
+    </ClInclude>
+    <ClInclude Include="OrderService.h">
       <Filter>Restaurant</Filter>
     </ClInclude>
-    <ClInclude Include="PriorityQueueNode.h">
-      <Filter>Generic_DS</Filter>
+    <ClInclude Include="ManageBreak.h">
+      <Filter>Restaurant</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -276,7 +282,10 @@
     <ClCompile Include="VipOrder.cpp">
       <Filter>Restaurant</Filter>
     </ClCompile>
-    <ClCompile Include="ServeOrder.cpp">
+    <ClCompile Include="OrderService.cpp">
+      <Filter>Restaurant</Filter>
+    </ClCompile>
+    <ClCompile Include="ManageBreak.cpp">
       <Filter>Restaurant</Filter>
     </ClCompile>
   </ItemGroup>

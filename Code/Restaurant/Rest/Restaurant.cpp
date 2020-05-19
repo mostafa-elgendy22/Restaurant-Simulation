@@ -3,17 +3,17 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include"..\PromotionEvent.h"
 #include "Restaurant.h"
-#include "..\Events\ArrivalEvent.h"
-#include"..\CancellationEvent.h"
+#include "../PromotionEvent.h"
+#include "../Events/ArrivalEvent.h"
+#include "../CancellationEvent.h"
+#include "../ManageBreak.h"
+
 
 
 Restaurant::Restaurant()
 {
 	pGUI = NULL;
-	pServ = NULL;
-	currentTimeStep = 0;
 	NumAutoPromoted = 0;
 	NumNormalOrders = NumVeganOrders = NumVipOrders = 0;
 }
@@ -23,52 +23,59 @@ void Restaurant::RunSimulation()
 {
 	pGUI = new GUI;
 	PROG_MODE mode = pGUI->getGUIMode();
+	ReadFile();
+	Run(mode);
+	PrintFile();
+}
 
-	switch (mode)
+
+
+void Restaurant::Run(PROG_MODE mode)
+{
+	int currentTimeStep = 0;
+	while (!InService_Orders_And_Cooks.isEmpty() || !NormalOrders.isEmpty()
+		|| !VipOrders.isEmpty() || !VeganOrders.isEmpty() || !EventsQueue.isEmpty())
 	{
-	case MODE_INTR:
-		ReadFile();
-		RunInteractive();
-		PrintFile();
-		break;
+		currentTimeStep++;
+		ExecuteEvents(currentTimeStep);
+		RemoveFromBreakList(currentTimeStep);
+		RemoveFromRestList(currentTimeStep);
+		CompleteOrders(currentTimeStep);
+		ManageOrders(currentTimeStep);
+		AssignOrders(currentTimeStep);
+		CheckInjuries(currentTimeStep);
 
-	case MODE_STEP:
-		ReadFile();
-		RunStepByStep();
-		PrintFile();
-		break;
+		switch (mode)
+		{
+		case MODE_INTR:
+			FillDrawingList(currentTimeStep);
+			pGUI->waitForClick();
+			break;
 
-	case MODE_SLNT:
-		ReadFile();
-		//simulation function call here
-		PrintFile();
-		break;
-	};
+		case MODE_STEP:
+			FillDrawingList(currentTimeStep);
+			Sleep(1000);
+			break;
+
+		case MODE_SLNT:
+			break;
+
+		}
+	}
+	pGUI->PrintMessage("Simulation ended, click to exit",1);
+	pGUI->waitForClick();
 }
 
-
-void Restaurant::RunInteractive()
-{
-	FillDrawingList();
-
-}
-
-
-void Restaurant::RunStepByStep()
-{
-
-}
-
-void Restaurant::ExecuteEvents(int CurrentTimeStep)
+void Restaurant::ExecuteEvents(int currentTimeStep)
 {
 	Event* pE;
 
 	while (EventsQueue.peekFront(pE))	//as long as there are more events
 	{
-		if (pE->getEventTime() > CurrentTimeStep)	//no more events at current timestep
+		if (pE->getEventTime() > currentTimeStep)	//no more events at current timestep
+		{
 			return;
-
-
+		}
 		pE->Execute(this);
 		EventsQueue.dequeue(pE);	//remove event from the queue
 
@@ -77,9 +84,203 @@ void Restaurant::ExecuteEvents(int CurrentTimeStep)
 	}
 }
 
-void Restaurant::AssignOrders()
+void Restaurant::RemoveFromBreakList(int currentTimeStep)
 {
+	Cook* pCook;
+	ManageBreak* pManage;
 
+	while (VipInBreak.Delete(pCook, currentTimeStep))
+	{
+		pManage = new ManageBreak(pCook);
+		pManage->EndBreak(this);
+	}
+
+	while (VeganInBreak.Delete(pCook, currentTimeStep))
+	{
+		pManage = new ManageBreak(pCook);
+		pManage->EndBreak(this);
+	}
+
+	while (NormalInBreak.Delete(pCook, currentTimeStep))
+	{
+		pManage = new ManageBreak(pCook);
+		pManage->EndBreak(this);
+	}
+
+}
+
+void Restaurant::RemoveFromRestList(int currentTimeStep)
+{
+	Cook* pCook;
+	ManageBreak* pManage;
+	while (VipInRest.peekFront(pCook))
+	{
+		if (pCook->GetStartBreakTime() + RstPrd == currentTimeStep)
+		{
+			VipInRest.dequeue(pCook);
+			pManage = new ManageBreak(pCook);
+			pManage->EndRest(this);
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	while (VeganInRest.peekFront(pCook))
+	{
+		if (pCook->GetStartBreakTime() + RstPrd == currentTimeStep)
+		{
+			VeganInRest.dequeue(pCook);
+			pManage = new ManageBreak(pCook);
+			pManage->EndRest(this);
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	while (NormalInRest.peekFront(pCook))
+	{
+		if (pCook->GetStartBreakTime() + RstPrd == currentTimeStep)
+		{
+			NormalInRest.dequeue(pCook);
+			pManage = new ManageBreak(pCook);
+			pManage->EndRest(this);
+		}
+		else
+		{
+			break;
+		}
+	}
+
+
+
+}
+
+void Restaurant::CompleteOrders(int currentTimeStep)
+{
+	OrderService* pServe = nullptr;
+
+	while (InService_Orders_And_Cooks.Delete(pServe, currentTimeStep))
+	{
+		pServe->FinishOrder(this, currentTimeStep);
+	}
+
+}
+
+void Restaurant::ManageOrders(int currentTimeStep)
+{
+	NormalOrder* pNorm;
+
+	if (NormalOrders.peekHead(pNorm))
+	{
+		if (pNorm->GetAT() + currentTimeStep == AutoPromote)
+		{
+			PromoteOrder(pNorm->GetID());
+			NumAutoPromoted++;
+		}
+	}
+
+	Queue<VipOrder*> tempq;
+	VipOrder* temporder;
+	Cook* pCook;
+	OrderService* pServe;
+	while (VipOrders.dequeue(temporder))
+	{
+		if (currentTimeStep - temporder->GetAT() < Vip_WT)
+		{
+			tempq.enqueue(temporder);
+			continue;
+		}
+		pCook = FindCookForUrgentOrder(temporder);
+		if (pCook)
+		{
+			pServe = new OrderService(temporder, pCook, currentTimeStep);
+			pServe->Serve(this);
+			continue;
+		}
+		VipOrders.enqueue(temporder);
+		break;
+	}
+	while (tempq.dequeue(temporder))
+		VipOrders.enqueue(temporder);
+}
+
+void Restaurant::AssignOrders(int currentTimeStep)
+{
+	OrderService* pServe = 0;
+	VipOrder* pVip;
+	NormalOrder* pNorm;
+	VeganOrder* pVegan;
+	Cook* pCook;
+
+	while (VipOrders.peekFront(pVip))
+	{
+		if (pVip->GetAT() >= currentTimeStep)
+		{
+			pCook = FindCook(pVip);
+			if (pCook)
+			{
+				pServe = new OrderService(pVip, pCook,currentTimeStep);
+				pServe->Serve(this);
+				VipOrders.dequeue(pVip);
+			}
+			else
+			{
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	while (VeganOrders.peekFront(pVegan))
+	{
+		if (pVegan->GetAT() >= currentTimeStep)
+		{
+			pCook = FindCook(pVegan);
+			if (pCook)
+			{
+				pServe = new OrderService(pVegan, pCook, currentTimeStep);
+				pServe->Serve(this);
+				VeganOrders.dequeue(pVegan);
+			}
+			else
+			{
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	while (NormalOrders.peekHead(pNorm))
+	{
+		if (pNorm->GetAT() >= currentTimeStep)
+		{
+			pCook = FindCook(pNorm);
+			if (pCook)
+			{
+				pServe = new OrderService(pNorm, pCook, currentTimeStep);
+				pServe->Serve(this);
+				NormalOrders.Delete(pNorm);
+			}
+			else
+			{
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
 }
 
 Restaurant::~Restaurant()
@@ -92,86 +293,218 @@ Restaurant::~Restaurant()
 }
 
 
-void Restaurant::FillDrawingList()
+void Restaurant::FillDrawingList(int currentTimeStep)
 {
+	int normnum, vegannum, vipnum;
+	int normcnum, vegancnum, vipcnum;
+	string str;
+	int servedSoFarN=0, servedSoFarVG=0, servedSoFarV=0;
+
 	pGUI->ResetDrawingList();
 
 	string timestep;
 
 	timestep += to_string(currentTimeStep);
 
-	int orders = FinishedOrders.GetLength();
-	Order** ord = FinishedOrders.toArray();
-	for (int i = 0; i < orders; i++)
+	int cnt = FinishedOrders.GetLength();
+	Order** arr = FinishedOrders.toArray();
+	for (int i = 0; i < cnt; i++)
 	{
-		pGUI->AddToDrawingList(ord[i]);
+		pGUI->AddToDrawingList(arr[i]);
+		switch (arr[i]->GetType())
+		{
+			case TYPE_NRM:
+				servedSoFarN++;
+				break;
+			case TYPE_VGAN:
+				servedSoFarVG++;
+				break;
+			case TYPE_VIP:
+				servedSoFarV++;
+				break;
+		}
 	}
 
-	ord = InServiceOrders.toArray();
-	int inser = orders;
-	for (int i = 0; i < orders; i++)
+	
+	OrderService** arr2 = InService_Orders_And_Cooks.toArray(cnt);
+	for (int i = 0; i < cnt; i++)
 	{
-		pGUI->AddToDrawingList(ord[i]);
+		Order* pOrder = arr2[i]->GetOrder();
+		Cook* pCook = arr2[i]->GetCook();
+		pGUI->AddToDrawingList(pOrder);
+		switch (pOrder->GetType())
+		{
+			case TYPE_NRM:
+				servedSoFarN++;
+				break;
+			case TYPE_VGAN:
+				servedSoFarVG++;
+				break;
+			case TYPE_VIP:
+				servedSoFarV++;
+				break;
+		}
+		if (arr2[i]->GetStartTime()== currentTimeStep)
+		{
+			switch (pCook->GetType())
+			{
+				case TYPE_NRM:
+					str += "N";
+					break;
+				case TYPE_VGAN:
+					str += "VG";
+					break;
+				case TYPE_VIP:
+					str += "V";
+					break;
+			}
+			str += to_string(pCook->GetID()) + "(";
+			switch (pOrder->GetType())
+			{
+				case TYPE_NRM:
+					str += "N";
+					break;
+				case TYPE_VGAN:
+					str += "VG";
+					break;
+				case TYPE_VIP:
+					str += "V";
+					break;
+			}
+			str += to_string(pOrder->GetID()) + ") ";
+		}
+
 	}
 
 	NormalOrder** pNorm;
+	normnum = cnt = NormalOrders.GetLength();
 	pNorm = NormalOrders.toArray();
-	int normnum = orders;
-	for (int i = 0; i < orders; i++)
+	for (int i = 0; i < cnt; i++)
 	{
 		pGUI->AddToDrawingList(pNorm[i]);
 	}
 
 	VeganOrder** pVgn;
-	pVgn = VeganOrders.toArray(orders);
-	int vegannum = orders;
-	for (int i = 0; i < orders; i++)
+	pVgn = VeganOrders.toArray(cnt);
+	vegannum = cnt;
+	for (int i = 0; i < cnt; i++)
 	{
 		pGUI->AddToDrawingList(pVgn[i]);
 	}
 
 	VipOrder** pVip;
-	pVip = VipOrders.toArray(orders);
-	int vipnum = orders;
-	for (int i = 0; i < orders; i++)
+	pVip = VipOrders.toArray(cnt);
+	vipnum = cnt;
+	for (int i = 0; i < cnt; i++)
 	{
 		pGUI->AddToDrawingList(pVip[i]);
 	}
 
-	int cooks;
-	Cook** co = NormalCooks.toArray(cooks);
-	int normcnum = cooks - inser / 3;
-	for (int i = 0; i < normcnum; i++)
+
+
+	Cook** co = NormalCooks.toArray(cnt);
+	normcnum = cnt;
+	for (int i = 0; i < cnt; i++)
 	{
 		pGUI->AddToDrawingList(co[i]);
 	}
 
-	co = VeganCooks.toArray(cooks);
-	int vegancnum = cooks - (inser - (inser / 3)) / 2;
-	for (int i = 0; i < vegancnum; i++)
+	co = VeganCooks.toArray(cnt);
+	vegancnum = cnt;
+	for (int i = 0; i < cnt; i++)
 	{
 		pGUI->AddToDrawingList(co[i]);
 	}
 
-	co = VipCooks.toArray(cooks);
-	int vipcnum = cooks - inser - (inser - (inser / 3)) / 2;
-	for (int i = 0; i < vipcnum; i++)
+	co = VipCooks.toArray(cnt);
+	vipcnum = cnt;
+	for (int i = 0; i < cnt; i++)
 	{
 		pGUI->AddToDrawingList(co[i]);
 	}
 
-	if (vegancnum < 0)vegancnum = 0;
-	if (vipcnum < 0)vipcnum = 0;
-	if (normcnum < 0)normcnum = 0;
 
-	pGUI->PrintMessage("TS : " + timestep + "   NRMWOrders: " + to_string(normnum) +
-		"	 VGNWOrders: " + to_string(vegannum) + "   VIPWOrders: " + to_string(vipnum) + "   NRMCooks: " + to_string(normcnum) +
-		"   VGNCooks: " + to_string(vegancnum) + "   VIPCooks: " + to_string(vipcnum));
+	pGUI->PrintMessage("TS: " + timestep + "   NRMWOrders: " + to_string(normnum) +
+		"	 VGNWOrders: " + to_string(vegannum) + "   VIPWOrders: " + to_string(vipnum) +
+		"   NRMCooks: " + to_string(normcnum) + "   VGNCooks: " + to_string(vegancnum) +
+		"   VIPCooks: " + to_string(vipcnum), 1);
+	
+	pGUI->PrintMessage(str, 2);
+
+	pGUI->PrintMessage("servedNRM: " + to_string(servedSoFarN) + " servedVGAN: " + to_string(servedSoFarVG)
+		+ " servedVIP: " + to_string(servedSoFarV), 3);
 
 
 	pGUI->UpdateInterface();
 }
 
+
+void Restaurant::AddToInserviceList(OrderService* pServe)
+{
+	InService_Orders_And_Cooks.Insert(pServe);
+}
+
+void Restaurant::AddToFinishedList(Order* ord)
+{
+	FinishedOrders.InsertEnd(ord);
+}
+
+int Restaurant::GetMaxNumberOrders()
+{
+	return maxNumCooks;
+}
+
+void Restaurant::AddToBreakList(Cook* pCook)
+{
+	if (pCook->GetType() == TYPE_VIP)
+	{
+		VipInBreak.Insert(pCook);
+		return;
+	}
+	if (pCook->GetType() == TYPE_NRM)
+	{
+		NormalInBreak.Insert(pCook);
+		return;
+	}
+	VeganInBreak.Insert(pCook);
+}
+
+void Restaurant::AddToRestList(Cook* pCook)
+{
+	if (pCook->GetType() == TYPE_VIP)
+	{
+		VipInRest.enqueue(pCook);
+		return;
+	}
+
+	if (pCook->GetType() == TYPE_VGAN)
+	{
+		VeganInRest.enqueue(pCook);
+		return;
+	}
+
+	if (pCook->GetType() == TYPE_NRM)
+	{
+		NormalInRest.enqueue(pCook);
+		return;
+	}
+}
+
+
+void Restaurant::AddToCookList(Cook* pCook)
+{
+	if (pCook->GetType() == TYPE_VIP)
+	{
+		VipCooks.enqueue(pCook);
+		return;
+	}
+	if (pCook->GetType() == TYPE_NRM)
+	{
+		NormalCooks.enqueue(pCook);
+		return;
+	}
+	VeganCooks.enqueue(pCook);
+}
 
 void Restaurant::AddToNormalList(NormalOrder* po)
 {
@@ -187,8 +520,111 @@ void Restaurant::AddToVeganList(VeganOrder* po)
 
 void Restaurant::AddToVipList(VipOrder* po)
 {
-	VipOrders.enqueue(po, 6.5);
+	VipOrders.enqueue(po);
 	NumVipOrders++;
+}
+
+Cook* Restaurant::FindCook(Order* ord)
+{
+	Cook* AppropiateCook;
+	if (dynamic_cast <VipOrder*> (ord))
+	{
+		if (VipCooks.dequeue(AppropiateCook))
+		{
+			return AppropiateCook;
+		}
+		else if (NormalCooks.dequeue(AppropiateCook))
+		{
+			return AppropiateCook;
+		}
+		else if (VeganCooks.dequeue(AppropiateCook))
+		{
+			return AppropiateCook;
+		}
+		else 
+		{
+			return nullptr;
+		}
+	}
+
+	if (dynamic_cast <NormalOrder*> (ord))
+	{
+		if (NormalCooks.dequeue(AppropiateCook))
+		{
+			return AppropiateCook;
+		}
+		else if (VipCooks.dequeue(AppropiateCook))
+		{
+			return AppropiateCook;
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+
+	if (dynamic_cast <VeganOrder*> (ord))
+	{
+		if (VeganCooks.dequeue(AppropiateCook))
+		{
+			return AppropiateCook;
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+}
+
+Cook* Restaurant::FindCookForUrgentOrder(VipOrder* pOrd)
+{
+	Cook* pCook = FindCook(pOrd);
+	if (pCook)
+	{
+		return pCook;
+	}
+
+	if (VipInBreak.Delete(pCook))
+	{
+		return pCook;
+	}
+
+	if (NormalInBreak.Delete(pCook))
+	{
+		return pCook;
+	}
+
+	if (VeganInBreak.Delete(pCook))
+	{
+		return pCook;
+	}
+	if (VipInRest.dequeue(pCook))
+	{
+		return pCook;
+	}
+	if (NormalInRest.dequeue(pCook))
+	{
+		return pCook;
+	}
+
+	if (VeganInRest.dequeue(pCook))
+	{
+		return pCook;
+	}
+}
+
+void Restaurant::CheckInjuries(int currentTimeStep)
+{
+	srand((int)time(NULL));
+	float R = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	if (R <= InjProb)
+	{
+		OrderService* pServe;
+		if (InService_Orders_And_Cooks.GetEntry(pServe))
+		{
+			pServe->InjureCook(currentTimeStep);
+		}
+	}
 }
 
 NormalOrder*& Restaurant::GetNormalOrderFromID(int ID)
@@ -214,10 +650,9 @@ void Restaurant::PromoteOrder(int ID)
 	{
 		VipOrder* order = new VipOrder(pOrd);
 		NormalOrders.Delete(pOrd);
-		VipOrders.enqueue(order, order->GetPriorityFactor());
+		VipOrders.enqueue(order);
 		NumNormalOrders--;
 		NumVipOrders++;
-		NumAutoPromoted++;
 	}
 }
 
@@ -227,9 +662,9 @@ void Restaurant::ReadFile()
 	ifstream inputFile;
 	string fileName = "../../Input Files/";
 	string temp;
-	int AutoPromote, NormalSpeed[2], VeganSpeed[2], VipSpeed[2], maxNumOrders, NormalBreak[2], VeganBreak[2], VipBreak[2];
+	int NormalSpeed[2], VeganSpeed[2], VipSpeed[2], maxNumOrders, NormalBreak[2], VeganBreak[2], VipBreak[2];
 	int EventsNumber;
-	pGUI->PrintMessage("Enter the name of the input file : ");
+	pGUI->PrintMessage("Enter the name of the input file : ",1);
 	temp = pGUI->GetString();
 	temp += ".txt";
 	fileName += temp;
@@ -331,7 +766,7 @@ void Restaurant::PrintFile()
 	string fileName = "../../Output Files/";
 	string temp;
 
-	pGUI->PrintMessage("Enter the name of the output file : ");
+	pGUI->PrintMessage("Enter the name of the output file : ",1);
 	temp = pGUI->GetString();
 	temp += ".txt";
 	fileName += temp;
@@ -345,7 +780,8 @@ void Restaurant::PrintFile()
 	for (int i = 0; i < FinishedOrders.GetLength(); i++)
 	{
 		Order* pOrd;
-		FinishedOrders.head(pOrd);
+		FinishedOrders.peekHead(pOrd);
+		FinishedOrders.Delete(pOrd);
 		int WT = pOrd->GetFT() - pOrd->GetAT() - pOrd->GetST();
 		OutputFile << pOrd->GetFT() << "\t" << pOrd->GetID() << "\t" << pOrd->GetAT() << "\t";
 		OutputFile << WT << "\t" << pOrd->GetST() << "\n";
@@ -364,3 +800,49 @@ void Restaurant::PrintFile()
 	OutputFile.close();
 }
 
+/*void Restaurant::simulate()
+{
+	int timestep = 0;
+	int ordernum = 0;
+	ReadFile();
+	pGUI->PrintMessage("Click to continue");
+	while (!InServiceOrders.isempty() || !NormalOrders.isempty()
+		|| !VipOrders.isEmpty() || !VeganOrders.isEmpty() ||
+		!EventsQueue.isEmpty())
+	{
+		pGUI->waitForClick();
+		timestep++;
+		ExecuteEvents(timestep);
+		Order* ptr;
+		if (NormalOrders.dequeue(ptr))
+		{
+			ptr->setStatus(SRV);
+			InServiceOrders.InsertEnd(ptr);
+		}
+		if (VipOrders.dequeue(ptr))
+		{
+			ptr->setStatus(SRV);
+			InServiceOrders.InsertEnd(ptr);
+		}
+		if (VeganOrders.dequeue(ptr))
+		{
+			ptr->setStatus(SRV);
+			InServiceOrders.InsertEnd(ptr);
+		}
+		if (timestep % 5 == 0)
+		{
+			int t = 3;
+			while (t--)
+			{
+				if (!InServiceOrders.dequeue(ptr))
+					break;
+				ptr->setStatus(DONE);
+				FinishedOrders.enqueue(ptr);
+			}
+		}
+		FillDrawingList(timestep);
+	}
+	pGUI->PrintMessage("Simulation ended, click to exit");
+	pGUI->waitForClick();
+}
+*/

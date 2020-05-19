@@ -1,20 +1,20 @@
 #pragma once
 
-#include"PriorityQueueNode.h"
+#include "Generic_DS/Node.h"
 
 
-template<typename T, typename K>
+template<typename T>
 class PriorityQueue
 {
 private:
 
-	PriorityQueueNode<T, K>* Front;
+	Node<T>* Front;
 
 public:
 
 	PriorityQueue();
 	bool isEmpty() const;
-	bool enqueue(const T& newEntry, K priority_key);
+	bool enqueue(const T& newEntry);
 	bool dequeue(T& frntEntry);
 	bool peekFront(T& frntEntry)  const;
 	T* toArray(int& count);	//returns array of T (array of items)
@@ -23,22 +23,22 @@ public:
 
 
 
-template<typename T, typename K>
-PriorityQueue<T, K>::PriorityQueue()
+template<typename T>
+PriorityQueue<T>::PriorityQueue()
 {
 	Front = nullptr;
 }
 
-template<typename T, typename K>
-bool PriorityQueue<T, K>::isEmpty() const
+template<typename T>
+bool PriorityQueue<T>::isEmpty() const
 {
 	return Front == nullptr;
 }
 
-template<typename T, typename K>
-bool PriorityQueue<T, K>::enqueue(const T& newEntry, K priority_key)
+template<typename T>
+bool PriorityQueue<T>::enqueue(const T& newEntry)
 {
-	PriorityQueueNode<T, K>* newnode = new PriorityQueueNode<T, K>(newEntry, priority_key);
+	Node<T>* newnode = new Node<T>(newEntry);
 
 	if (Front == nullptr)
 	{
@@ -47,18 +47,18 @@ bool PriorityQueue<T, K>::enqueue(const T& newEntry, K priority_key)
 	}
 
 
-	if (newnode->getPriority() > Front->getPriority())
+	if (*(newnode->getItem()) > * (Front->getItem()))
 	{
 		newnode->setNext(Front);
 		Front = newnode;
 		return true;
 	}
 
-	PriorityQueueNode<T, K>* ptr = Front->getNext();
-	PriorityQueueNode<T, K>* prev = Front;
+	Node<T>* ptr = Front->getNext();
+	Node<T>* prev = Front;
 	while (ptr)
 	{
-		if (ptr->getPriority() < newnode->getPriority())
+		if (*(newnode->getItem()) > * (ptr->getItem()))
 		{
 			newnode->setNext(ptr);
 			prev->setNext(newnode);
@@ -72,13 +72,13 @@ bool PriorityQueue<T, K>::enqueue(const T& newEntry, K priority_key)
 }
 
 
-template<typename T, typename K>
-bool PriorityQueue<T, K>::dequeue(T& frontEntry)
+template<typename T>
+bool PriorityQueue<T>::dequeue(T& frontEntry)
 {
 	if (isEmpty())
 		return false;
 
-	PriorityQueueNode<T, K>* nodeToDeletePtr = Front;
+	Node<T>* nodeToDeletePtr = Front;
 	frontEntry = Front->getItem();
 	Front = Front->getNext();
 
@@ -87,8 +87,8 @@ bool PriorityQueue<T, K>::dequeue(T& frontEntry)
 	return true;
 }
 
-template<typename T, typename K>
-bool PriorityQueue<T, K>::peekFront(T& frontEntry)  const
+template<typename T>
+bool PriorityQueue<T>::peekFront(T& frontEntry)  const
 {
 	if (isEmpty())
 		return false;
@@ -99,28 +99,28 @@ bool PriorityQueue<T, K>::peekFront(T& frontEntry)  const
 
 
 
-template<typename T, typename K>
-PriorityQueue<T, K>::~PriorityQueue()
+template<typename T>
+PriorityQueue<T>::~PriorityQueue()
 {
 	while (Front)
 	{
-		PriorityQueueNode<T, K>* temp = Front;
+		Node<T>* temp = Front;
 		Front = Front->getNext();
 		delete temp;
 	}
 }
 
 
-template <typename T, typename K>
-T* PriorityQueue<T, K>::toArray(int& count)
+template <typename T>
+T* PriorityQueue<T>::toArray(int& count)
 {
 	count = 0;
 
 	if (!Front)
 		return nullptr;
 	//counting the no. of items in the Queue
-	PriorityQueueNode<T, K>* p = Front;
-	PriorityQueueNode<T, K>* e = p;
+	Node<T>* p = Front;
+	Node<T>* e = p;
 	do
 	{
 		count++;

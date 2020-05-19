@@ -4,7 +4,7 @@
 class PromotionEvent : public Event
 {
 
-	double money;
+	double ExMoney;
 public:
 
 	PromotionEvent(int eTime, int oID, int r_money);

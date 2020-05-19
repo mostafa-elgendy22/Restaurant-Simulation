@@ -50,7 +50,7 @@ string GUI::GetString() const
 		else
 			Label += Key;
 		
-		PrintMessage(Label);
+		PrintMessage(Label,1);
 	}
 }
 
@@ -58,13 +58,14 @@ string GUI::GetString() const
 // ================================== OUTPUT FUNCTIONS ===================================
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void GUI::PrintMessage(string msg) const	//Prints a message on status bar
+void GUI::PrintMessage(string msg,int line) const	//Prints a message on status bar
 {
+	if(line==1)
 	ClearStatusBar();	//First clear the status bar
 	
 	pWind->SetPen(DARKRED);
 	pWind->SetFont(18, BOLD , BY_NAME, "Arial");   
-	pWind->DrawString(10, WindHeight - (int) (StatusBarHeight/1.5), msg); // You may need to change these coordinates later 
+	pWind->DrawString(10, WindHeight - (int) (StatusBarHeight/1.5)+(int)(StatusBarHeight/3)*(line-1), msg); // You may need to change these coordinates later 
 	                                                                      // to be able to write multi-line
 }
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -277,7 +278,7 @@ PROG_MODE	GUI::getGUIMode() const
 	PROG_MODE Mode;
 	do
 	{
-		PrintMessage("Please select GUI mode: (1)Interactive, (2)StepByStep, (3)Silent ");
+		PrintMessage("Please select GUI mode: (1)Interactive, (2)StepByStep, (3)Silent ",1);
 		string S = GetString();
 		Mode = (PROG_MODE) (atoi(S.c_str())-1);
 	}

@@ -7,15 +7,14 @@
 
 class ArrivalEvent : public Event
 {
-	int OrdSize;	      //order distance
+	int OrdSize;	      //order size
 	ORD_TYPE OrdType;    //order type: Normal, vegan, VIP	                
 	double OrdMoney;	//Total order money
-	int autoP;          //for normal orders
 
 
 public:
 
-	ArrivalEvent(int eTime, int oID, ORD_TYPE oType, double oMoney, int size, int autoP = -1);
+	ArrivalEvent(int eTime, int oID, ORD_TYPE oType, double oMoney, int size);
 
 
 	virtual void Execute(Restaurant* pRest);	//override execute function

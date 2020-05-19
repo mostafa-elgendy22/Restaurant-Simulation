@@ -6,6 +6,7 @@
 
 class Order
 {
+
 protected:
 
 	int ID;              //Each order has a unique ID (from 1 --> 999 )
@@ -20,7 +21,6 @@ protected:
 
 	int ArrTime, ServTime, FinishTime;	//arrival, service start, and finish times
 
-	bool isAssigned;
 
 public:
 
@@ -32,29 +32,31 @@ public:
 
 	ORD_TYPE GetType() const;
 
-	void Setsize(int d);
+	void SetSize(int s);
 
-	int Getsize() const;
+	int GetSize() const;
 
-	void setStatus(ORD_STATUS s);
+	void SetStatus(ORD_STATUS s);
 
 	ORD_STATUS getStatus() const;
 
 	void SetType(ORD_TYPE typ);
 
-	bool operator > (const Order& x) const;
-
 	bool operator == (const Order*& ord);
 
-	operator int() const;
-
 	int GetAT();
-	
+
 	int GetST();
 
 	int GetFT();
 
 	double GetMoney();
+
+	void SetMoney(double money);
+
+	void SetST(int time);
+
+	void SetFT(int time);
 };
 
 #endif
