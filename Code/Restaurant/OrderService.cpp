@@ -17,6 +17,17 @@ void OrderService::Serve(Restaurant* pRest)
 	pRest->AddToInserviceList(this);
 	ord->SetST(ServiceTime);
 	ord->SetFT(ServiceTime + ord->GetAT());
+	if (dynamic_cast<VipOrder*> (ord))
+	{
+		VipOrder* pVip = dynamic_cast<VipOrder*> (ord);
+		if (pVip->IsUrgent())
+		{
+			if (cook->GetStartBreakTime() + cook->GetBreakDuration() < startTime)
+			{
+				cook->ResetServicedOrders();
+			}
+		}
+	}
 }
 
 void OrderService::InjureCook(int currentTimeStep)
@@ -33,13 +44,22 @@ void OrderService::FinishOrder(Restaurant* pRest, int time)
 {
 	cook->IncrementServicedOrders();
 	ord->SetStatus(DONE);
-	ord->SetFT(time);
 	pRest->AddToFinishedList(ord);
-	if (cook->IsInjured())
+
+	VipOrder* pVip = dynamic_cast<VipOrder*> (ord);
+	if (pVip && pVip->IsUrgent())
+	{
+		if (cook->GetServicedOrders() == Cook::GetMaxNumberOrders())
+		{
+			cook->ResetServicedOrders();
+		}
+		pRest->AddToCookList(cook);
+	}
+	else if (cook->IsInjured())
 	{
 		pRest->AddToRestList(cook);
 	}
-	else if (cook->GetServicedOrders() == pRest->GetMaxNumberOrders())
+	else if (cook->GetServicedOrders() == Cook::GetMaxNumberOrders())
 	{
 		pRest->AddToBreakList(cook);
 	}

@@ -10,7 +10,8 @@ class BinarySearchTree
 	//utility functions
 
 	static void rec_insert(T& item, BinaryTreeNode<T>*& subRoot);
-	static BinaryTreeNode<T>* rec_delete(T& item, K key, BinaryTreeNode<T>* subRoot, bool& isDeleted, bool& entry);
+	static BinaryTreeNode<T>* rec_delete(T& item, K key, BinaryTreeNode<T>*& subRoot, bool& isDeleted, bool& entry);
+	static BinaryTreeNode<T>* rec_leaf_delete(T& item, BinaryTreeNode<T>* subRoot, bool& isDeleted);
 	static BinaryTreeNode<T>* FindMin(BinaryTreeNode<T>* subRoot);
 	static int rec_getcount(BinaryTreeNode<T>* root);
 	static void rec_fillarrinorder(BinaryTreeNode<T>* root, T* Arr, int& indx);
@@ -21,10 +22,8 @@ public:
 	BinarySearchTree();
 	void Insert(T& item);
 	bool Delete(T& item, K key = -1);
-
 	bool isEmpty();
 	bool GetEntry(T& item);
-
 	T* toArray(int& cnt);
 };
 
@@ -46,8 +45,11 @@ void BinarySearchTree<T, K>::rec_insert(T& item, BinaryTreeNode<T>*& subRoot)
 	if (!subRoot)
 	{
 		subRoot = new BinaryTreeNode<T>(item);
+		return;
 	}
-	else if (K(subRoot->GetItem()) <= K(item))
+	K key1 = *(subRoot->GetItem());
+	K key2 = *(item);
+	if (key1 <= key2)
 	{
 		rec_insert(item, subRoot->GetRight());
 	}
@@ -78,7 +80,7 @@ BinaryTreeNode<T>* BinarySearchTree<T, K>::FindMin(BinaryTreeNode<T>* subRoot)
 }
 
 template<class T, class K>
-BinaryTreeNode<T>* BinarySearchTree<T, K>::rec_delete(T& item, K key, BinaryTreeNode<T>* subRoot, bool& isDeleted, bool& entry)
+BinaryTreeNode<T>* BinarySearchTree<T, K>::rec_delete(T& item, K key, BinaryTreeNode<T>*& subRoot, bool& isDeleted, bool& entry)
 {
 	if (!subRoot)
 	{
@@ -113,18 +115,21 @@ BinaryTreeNode<T>* BinarySearchTree<T, K>::rec_delete(T& item, K key, BinaryTree
 				BinaryTreeNode<T>* temp = subRoot;
 				subRoot = subRoot->GetRight();
 				delete temp;
+				temp = nullptr;
 			}
 			else if (!subRoot->GetRight())
 			{
 				BinaryTreeNode<T>* temp = subRoot;
 				subRoot = subRoot->GetLeft();
 				delete temp;
+				temp = nullptr;
 			}
 			else
 			{
 				BinaryTreeNode<T>* temp = FindMin(subRoot->GetRight());
 				subRoot->SetItem(temp->GetItem());
-				subRoot->SetRight(rec_delete(item, K(temp->GetItem()), subRoot->GetRight(), isDeleted, entry));
+				K Key = *(temp->GetItem());
+				subRoot->SetRight(rec_delete(item, Key, subRoot->GetRight(), isDeleted, entry));
 			}
 			isDeleted = true;
 			return subRoot;
@@ -133,11 +138,37 @@ BinaryTreeNode<T>* BinarySearchTree<T, K>::rec_delete(T& item, K key, BinaryTree
 }
 
 template<class T, class K>
+BinaryTreeNode<T>* BinarySearchTree<T, K>::rec_leaf_delete(T& item, BinaryTreeNode<T>* subRoot, bool& isDeleted)
+{
+	if (!subRoot)
+	{
+		return nullptr;
+	}
+
+	if (!subRoot->GetLeft() && !subRoot->GetRight() && !isDeleted)
+	{
+		item = subRoot->GetItem();
+		delete subRoot;
+		isDeleted = true;
+		return nullptr;
+	}
+	subRoot->SetLeft(rec_leaf_delete(item, subRoot->GetLeft(), isDeleted));
+	subRoot->SetRight(rec_leaf_delete(item, subRoot->GetRight(), isDeleted));
+}
+
+template<class T, class K>
 bool BinarySearchTree<T, K>::Delete(T& item, K key)
 {
 	bool isDeleted = false;
 	bool entry = false;
-	rec_delete(item, key, Root, isDeleted, entry);
+	if (key == -1)
+	{
+		rec_leaf_delete(item, Root, isDeleted);
+	}
+	else
+	{
+		rec_delete(item, key, Root, isDeleted, entry);
+	}
 	return isDeleted;
 }
 
@@ -153,6 +184,7 @@ void BinarySearchTree<T, K>::rec_get_entry(BinaryTreeNode<T>* subRoot, T& item, 
 	{
 		item = subRoot->GetItem();
 		isFound = true;
+		return;
 	}
 	rec_get_entry(subRoot->GetLeft(), item, isFound);
 	rec_get_entry(subRoot->GetRight(), item, isFound);
@@ -169,18 +201,21 @@ bool BinarySearchTree<T, K>::GetEntry(T& item)
 template<class T, class K>
 int BinarySearchTree<T, K>::rec_getcount(BinaryTreeNode<T>* root)
 {
-	if (!root)return 0;
+	if (!root)
+		return 0;
+
 	return 1 + rec_getcount(root->GetLeft()) + rec_getcount(root->GetRight());
 }
 
 template<class T, class K>
 void BinarySearchTree<T, K>::rec_fillarrinorder(BinaryTreeNode<T>* root, T* Arr, int& indx)
 {
-	if (!root)return;
+	if (!root)
+		return;
+
 	rec_fillarrinorder(root->GetLeft(), Arr, indx);
 	Arr[indx++] = root->GetItem();
 	rec_fillarrinorder(root->GetRight(), Arr, indx);
-
 }
 
 template<class T, class K>

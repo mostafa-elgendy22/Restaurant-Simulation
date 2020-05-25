@@ -9,6 +9,9 @@ PromotionEvent::PromotionEvent(int eTime, int oID, int r_money) :Event(eTime, oI
 void PromotionEvent::Execute(Restaurant* pRest)
 {
 	NormalOrder* pOrd = pRest->GetNormalOrderFromID(OrderID);
-	pOrd->SetMoney(pOrd->GetMoney() + ExMoney);
-	pRest->PromoteOrder(OrderID);
+	if (pOrd)
+	{
+		pOrd->SetMoney(pOrd->GetMoney() + ExMoney);
+		pRest->PromoteOrder(OrderID);
+	}
 }

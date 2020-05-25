@@ -12,6 +12,7 @@ public:
 	BinaryTreeNode(T data)
 	{
 		item = data;
+		left = right = nullptr;
 	}
 
 	void SetItem(T data)

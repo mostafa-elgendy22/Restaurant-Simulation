@@ -6,7 +6,7 @@ class VipOrder : public Order
 {
 	float PriorityFactor;
 	bool isUrgent;
-
+	static int Vip_WT;
 
 	void CalculatePriorityFactor();
 
@@ -15,10 +15,14 @@ public:
 
 	VipOrder(NormalOrder* ord);
 
+	static void SetVipWT(int time);
+
 	float GetPriorityFactor();
 
 	bool IsUrgent();
 
-	bool operator > (VipOrder* ord);
+	bool operator > (VipOrder ord);
+
+	operator int();
 };
 

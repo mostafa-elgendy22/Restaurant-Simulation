@@ -138,8 +138,8 @@
     <ClInclude Include="OrderService.h">
       <Filter>Restaurant</Filter>
     </ClInclude>
-    <ClInclude Include="ManageBreak.h">
-      <Filter>Restaurant</Filter>
+    <ClInclude Include="LinkedSortedList.h">
+      <Filter>Generic_DS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -283,9 +283,6 @@
       <Filter>Restaurant</Filter>
     </ClCompile>
     <ClCompile Include="OrderService.cpp">
-      <Filter>Restaurant</Filter>
-    </ClCompile>
-    <ClCompile Include="ManageBreak.cpp">
       <Filter>Restaurant</Filter>
     </ClCompile>
   </ItemGroup>

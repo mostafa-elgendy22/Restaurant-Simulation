@@ -9,6 +9,7 @@
 #include "../Events/Event.h"
 #include "../PriorityQueue.h"
 #include "../LinkedList.h"
+#include "../LinkedSortedList.h"
 #include "../BinarySearchTree.h"
 #include "../VipOrder.h"
 #include "../VeganOrder.h"
@@ -23,7 +24,7 @@ private:
 	GUI* pGUI;
 	Queue<Event*> EventsQueue;	   //Queue of all events that will be loaded from the input file
 
-	PriorityQueue<VipOrder*> VipOrders;
+	LinkedSortedList<VipOrder*,float> VipOrders;
 	LinkedList<NormalOrder*, int> NormalOrders;
 	Queue<VeganOrder*> VeganOrders;
 
@@ -54,17 +55,12 @@ private:
 	int NumVeganOrders;          //number of vegan orders
 	int NumVipOrders;           //number of vip orders
 
-	int maxNumCooks;    //number of orders a cook must prepare before taking a break
-	int Vip_WT;
 	float InjProb;
-	int RstPrd;
 	int NumUrgentOrders;
 	int NumInjuredCooks;
-	int AutoPromote;
 
 
 public:
-
 
 	Restaurant();
 
@@ -80,7 +76,6 @@ public:
 
 	void ExecuteEvents(int TimeStep);	//executes all events at current timestep
 
-
 	NormalOrder*& GetNormalOrderFromID(int ID);
 
 	void CancelOrder(int ID);
@@ -88,8 +83,6 @@ public:
 	void PromoteOrder(int ID);
 
 	void FillDrawingList(int currentTimeStep);
-
-
 
 	void AddToNormalList(NormalOrder* po);
 
@@ -112,8 +105,6 @@ public:
 	void AddToInserviceList(OrderService* pServe);
 
 	void AddToFinishedList(Order* ord);
-
-	int GetMaxNumberOrders();
 
 	void AddToBreakList(Cook* pCook);
 

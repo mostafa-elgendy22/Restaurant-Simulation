@@ -1,4 +1,8 @@
 #include "Cook.h"
+#include "Restaurant.h"
+
+int Cook::maxNumOrders = 0;
+int Cook::RstPrd = 0;
 
 
 Cook::Cook(int r_id, ORD_TYPE r_type, int r_speed, int Break)
@@ -21,6 +25,10 @@ int Cook::GetID() const
 	return ID;
 }
 
+void Cook::SetRestPeriod(int time)
+{
+	RstPrd = time;
+}
 
 ORD_TYPE Cook::GetType() const
 {
@@ -48,16 +56,15 @@ void Cook::HalfSpeed()
 	speed = speed / 2;
 }
 
-void Cook::DoubleSpeed()
-{
-	speed = speed * 2;
-}
-
 void Cook::IncrementServicedOrders()
 {
 	ServicedOrders++;
 }
 
+int Cook::GetBreakDuration()
+{
+	return BreakDuration;
+}
 int Cook::GetServicedOrders()
 {
 	return ServicedOrders;
@@ -89,4 +96,34 @@ bool Cook::IsInjured()
 Cook::operator int()
 {
 	return (StartBreakTime + BreakDuration);
+}
+
+void Cook::SetMaxNumOrders(int number)
+{
+	maxNumOrders = number;
+}
+
+int Cook::GetMaxNumberOrders()
+{
+	return maxNumOrders;
+}
+
+int Cook::GetRestPeriod()
+{
+	return RstPrd;
+}
+
+void Cook::EndBreak(Restaurant* pRest)
+{
+	ServicedOrders = 0;
+	StartBreakTime = -1;
+	pRest->AddToCookList(this);
+}
+
+void Cook::EndRest(Restaurant* pRest)
+{
+	isInjured = false;
+	speed = speed * 2;
+	StartBreakTime = -1;
+	pRest->AddToCookList(this);
 }

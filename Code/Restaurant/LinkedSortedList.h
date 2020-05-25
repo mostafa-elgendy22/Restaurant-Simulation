@@ -1,14 +1,9 @@
-#ifndef _LINKEDLIST
-#define _LINKEDLIST
-
+#pragma once
 #include "Generic_DS/Node.h"
 
-
-template <class T, class K = T>    // K is for searching using a key value
-class LinkedList
+template<class T, class K>
+class LinkedSortedList
 {
-private:
-
 	Node<T>* Head;	//Pointer to the head of the list
 
 	Node<T>* Back;  //Pointer to the back of the list
@@ -17,22 +12,21 @@ private:
 
 public:
 
-	LinkedList();
-	~LinkedList();
+	LinkedSortedList();
+	~LinkedSortedList();
 	bool isEmpty();
 	int GetLength();
-	void InsertEnd(const T& data);
+	void Insert(const T& item);
 	void Clear();
 	bool Delete(T& item);
 	bool peekHead(T& frontEntry);
 	T* toArray();
 	bool GetEntry(T& item, K key);
 };
-#endif	
 
 
 template<class T, class K>
-LinkedList<T, K>::LinkedList()
+LinkedSortedList<T, K>::LinkedSortedList()
 {
 	Head = nullptr;
 	Back = nullptr;
@@ -40,21 +34,22 @@ LinkedList<T, K>::LinkedList()
 }
 
 template<class T, class K>
-LinkedList<T, K>::~LinkedList()
+LinkedSortedList<T, K>::~LinkedSortedList()
 {
 	Clear();
 }
 
 template<class T, class K>
-bool LinkedList<T, K>::isEmpty()
+bool LinkedSortedList<T, K>::isEmpty()
 {
 	return count == 0;
 }
 
+
 template<class T, class K>
-void LinkedList<T, K>::InsertEnd(const T& data)
+void LinkedSortedList<T, K>::Insert(const T& item)
 {
-	Node<T>* ptr = new Node<T>(data);
+	Node<T>* ptr = new Node<T>(item);
 
 	if (!Head)
 	{
@@ -65,13 +60,40 @@ void LinkedList<T, K>::InsertEnd(const T& data)
 		return;
 	}
 
-	Back->setNext(ptr);
-	Back = ptr;
-	count++;
+	if (*(Back->getItem()) > * (ptr->getItem()))
+	{
+		Back->setNext(ptr);
+		Back = ptr;
+		count++;
+		return;
+	}
+
+	if (*(Head->getItem()) < *(ptr->getItem()))
+	{
+		ptr->setNext(Head);
+		Head = ptr;
+		count++;
+		return;
+	}
+
+	Node<T>* prev = Head;
+	Node<T>* current = Head->getNext();
+	while (current)
+	{
+		if (*(ptr->getItem()) > * (current->getItem()))
+		{
+			ptr->setNext(current);
+			prev->setNext(ptr);
+			count++;
+			return;
+		}
+		prev = current;
+		current = current->getNext();
+	}
 }
 
 template<class T, class K>
-void LinkedList<T, K>::Clear()
+void LinkedSortedList<T, K>::Clear()
 {
 	Node<T>* P = Head;
 	while (Head)
@@ -85,7 +107,7 @@ void LinkedList<T, K>::Clear()
 }
 
 template<class T, class K>
-bool LinkedList<T, K>::Delete(T& item)
+bool LinkedSortedList<T, K>::Delete(T& item)
 {
 	if (!Head)
 		return false;
@@ -121,7 +143,7 @@ bool LinkedList<T, K>::Delete(T& item)
 }
 
 template<class T, class K>
-bool LinkedList<T, K>::peekHead(T& frontEntry)  //to get the head
+bool LinkedSortedList<T, K>::peekHead(T& frontEntry)  //to get the head
 {
 	if (isEmpty())
 		return false;
@@ -132,7 +154,7 @@ bool LinkedList<T, K>::peekHead(T& frontEntry)  //to get the head
 }
 
 template<class T, class K>
-T* LinkedList<T, K>::toArray()
+T* LinkedSortedList<T, K>::toArray()
 {
 	if (!Head)
 		return nullptr;
@@ -151,13 +173,13 @@ T* LinkedList<T, K>::toArray()
 
 
 template<class T, class K>
-int LinkedList<T, K>::GetLength()
+int LinkedSortedList<T, K>::GetLength()
 {
 	return count;
 }
 
 template<class T, class K>
-bool LinkedList<T, K>::GetEntry(T& item, K key)
+bool LinkedSortedList<T, K>::GetEntry(T& item, K key)
 {
 	if (!Head)
 	{

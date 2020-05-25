@@ -105,7 +105,7 @@
     <ClInclude Include="Generic_DS\Queue.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="LinkedList.h" />
-    <ClInclude Include="ManageBreak.h" />
+    <ClInclude Include="LinkedSortedList.h" />
     <ClInclude Include="NormalOrder.h" />
     <ClInclude Include="PriorityQueue.h" />
     <ClInclude Include="PromotionEvent.h" />
@@ -157,7 +157,6 @@
     <ClCompile Include="Events\Event.cpp" />
     <ClCompile Include="Events\ArrivalEvent.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
-    <ClCompile Include="ManageBreak.cpp" />
     <ClCompile Include="NormalOrder.cpp" />
     <ClCompile Include="PromotionEvent.cpp" />
     <ClCompile Include="Rest\Cook.cpp" />
