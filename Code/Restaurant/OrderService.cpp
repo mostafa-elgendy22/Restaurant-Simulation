@@ -22,9 +22,12 @@ void OrderService::Serve(Restaurant* pRest)
 		VipOrder* pVip = dynamic_cast<VipOrder*> (ord);
 		if (pVip->IsUrgent())
 		{
-			if (cook->GetStartBreakTime() + cook->GetBreakDuration() < startTime)
+			if (cook->GetStartBreakTime() != -1) // the cook was in break or rest
 			{
-				cook->ResetServicedOrders();
+				if (!(cook->IsInjured()))       // the cook was in break
+				{
+					cook->ResetServicedOrders();
+				}
 			}
 		}
 	}
@@ -57,10 +60,16 @@ void OrderService::FinishOrder(Restaurant* pRest, int time)
 	}
 	else if (cook->IsInjured())
 	{
+		if (cook->GetServicedOrders() == Cook::GetMaxNumberOrders())
+		{
+			cook->ResetServicedOrders();
+		}
+		cook->SetStartBreakTime(time);
 		pRest->AddToRestList(cook);
 	}
 	else if (cook->GetServicedOrders() == Cook::GetMaxNumberOrders())
 	{
+		cook->SetStartBreakTime(time);
 		pRest->AddToBreakList(cook);
 	}
 	else
