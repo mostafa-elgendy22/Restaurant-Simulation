@@ -24,24 +24,24 @@ private:
 	GUI* pGUI;
 	Queue<Event*> EventsQueue;	   //Queue of all events that will be loaded from the input file
 
-	LinkedSortedList<VipOrder*,float> VipOrders;
+	LinkedSortedList<VipOrder*, int> VipOrders;
 	LinkedList<NormalOrder*, int> NormalOrders;
 	Queue<VeganOrder*> VeganOrders;
 
-	BinarySearchTree<OrderService* ,int>InService_Orders_And_Cooks;
+	BinarySearchTree<OrderService*, int>InServiceOrders;
 	LinkedList<Order*, int>FinishedOrders;
 
 	Queue<Cook*>NormalCooks;
 	Queue<Cook*>VeganCooks;
 	Queue<Cook*>VipCooks;
 
-	BinarySearchTree<Cook*, int>NormalInBreak;
+	PriorityQueue<Cook*>NormalInBreak;
 	Queue<Cook*>NormalInRest;
 
-	BinarySearchTree<Cook*, int>VeganInBreak;
+	PriorityQueue<Cook*>VeganInBreak;
 	Queue<Cook*>VeganInRest;
 
-	BinarySearchTree<Cook*, int>VipInBreak;
+	PriorityQueue<Cook*>VipInBreak;
 	Queue<Cook*>VipInRest;
 
 
@@ -116,4 +116,3 @@ public:
 
 	void AddToRestList(Cook* pCook);
 };
-

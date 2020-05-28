@@ -9,8 +9,6 @@
 #include "../CancellationEvent.h"
 
 
-
-
 Restaurant::Restaurant()
 {
 	pGUI = NULL;
@@ -18,7 +16,6 @@ Restaurant::Restaurant()
 	NumNormalOrders = NumVeganOrders = NumVipOrders = 0;
 	NumUrgentOrders = NumInjuredCooks = 0;
 }
-
 
 void Restaurant::RunSimulation()
 {
@@ -29,12 +26,10 @@ void Restaurant::RunSimulation()
 	PrintFile();
 }
 
-
-
 void Restaurant::Run(PROG_MODE mode)
 {
 	int currentTimeStep = 0;
-	while (!InService_Orders_And_Cooks.isEmpty() || !NormalOrders.isEmpty()
+	while (!InServiceOrders.isEmpty() || !NormalOrders.isEmpty()
 		|| !VipOrders.isEmpty() || !VeganOrders.isEmpty() || !EventsQueue.isEmpty())
 	{
 		currentTimeStep++;
@@ -63,7 +58,7 @@ void Restaurant::Run(PROG_MODE mode)
 
 		}
 	}
-	pGUI->PrintMessage("Simulation ended, click to exit", 1);
+	pGUI->PrintMessage("Simulation ended, click to continue", 1);
 	pGUI->waitForClick();
 }
 
@@ -89,19 +84,42 @@ void Restaurant::RemoveFromBreakList(int currentTimeStep)
 {
 	Cook* pCook;
 
-	while (VipInBreak.Delete(pCook, currentTimeStep))
+	while (VipInBreak.peekFront(pCook))
 	{
-		pCook->EndBreak(this);
+		if (pCook->GetStartBreakTime() + pCook->GetBreakDuration() == currentTimeStep)
+		{
+			VipInBreak.dequeue(pCook);
+			pCook->EndBreak(this);
+		}
+		else
+		{
+			break;
+		}
 	}
 
-	while (VeganInBreak.Delete(pCook, currentTimeStep))
+	while (VeganInBreak.peekFront(pCook))
 	{
-		pCook->EndBreak(this);
+		if (pCook->GetStartBreakTime() + pCook->GetBreakDuration() == currentTimeStep)
+		{
+			VeganInBreak.dequeue(pCook);
+			pCook->EndBreak(this);
+		}
+		else
+		{
+			break;
+		}
 	}
-
-	while (NormalInBreak.Delete(pCook, currentTimeStep))
+	while (NormalInBreak.peekFront(pCook))
 	{
-		pCook->EndBreak(this);
+		if (pCook->GetStartBreakTime() + pCook->GetBreakDuration() == currentTimeStep)
+		{
+			NormalInBreak.dequeue(pCook);
+			pCook->EndBreak(this);
+		}
+		else
+		{
+			break;
+		}
 	}
 }
 
@@ -152,7 +170,7 @@ void Restaurant::CompleteOrders(int currentTimeStep)
 {
 	OrderService* pServe = nullptr;
 
-	while (InService_Orders_And_Cooks.Delete(pServe, currentTimeStep))
+	while (InServiceOrders.Delete(pServe, currentTimeStep))
 	{
 		pServe->FinishOrder(this, currentTimeStep);
 	}
@@ -311,7 +329,7 @@ void Restaurant::FillDrawingList(int currentTimeStep)
 	}
 
 
-	OrderService** arr2 = InService_Orders_And_Cooks.toArray(cnt);
+	OrderService** arr2 = InServiceOrders.toArray(cnt);
 	for (int i = 0; i < cnt; i++)
 	{
 		Order* pOrder = arr2[i]->GetOrder();
@@ -427,7 +445,7 @@ void Restaurant::FillDrawingList(int currentTimeStep)
 
 void Restaurant::AddToInserviceList(OrderService* pServe)
 {
-	InService_Orders_And_Cooks.Insert(pServe);
+	InServiceOrders.Insert(pServe);
 }
 
 void Restaurant::AddToFinishedList(Order* ord)
@@ -440,15 +458,15 @@ void Restaurant::AddToBreakList(Cook* pCook)
 {
 	if (pCook->GetType() == TYPE_VIP)
 	{
-		VipInBreak.Insert(pCook);
+		VipInBreak.enqueue(pCook);
 		return;
 	}
 	if (pCook->GetType() == TYPE_NRM)
 	{
-		NormalInBreak.Insert(pCook);
+		NormalInBreak.enqueue(pCook);
 		return;
 	}
-	VeganInBreak.Insert(pCook);
+	VeganInBreak.enqueue(pCook);
 }
 
 void Restaurant::AddToRestList(Cook* pCook)
@@ -567,17 +585,17 @@ Cook* Restaurant::FindCookForUrgentOrder(VipOrder* pOrd)
 		return pCook;
 	}
 
-	if (VipInBreak.Delete(pCook))
+	if (VipInBreak.dequeue(pCook))
 	{
 		return pCook;
 	}
 
-	if (NormalInBreak.Delete(pCook))
+	if (NormalInBreak.dequeue(pCook))
 	{
 		return pCook;
 	}
 
-	if (VeganInBreak.Delete(pCook))
+	if (VeganInBreak.dequeue(pCook))
 	{
 		return pCook;
 	}
@@ -601,12 +619,12 @@ Cook* Restaurant::FindCookForUrgentOrder(VipOrder* pOrd)
 void Restaurant::CheckInjuries(int currentTimeStep)
 {
 	srand((int)time(NULL));
-	float R = (rand() % 100) / 100.0;
+	float R = (rand() % 101) / 100.0;
 
 	if (R <= InjProb)
 	{
 		OrderService* pServe;
-		if (InService_Orders_And_Cooks.GetEntry(pServe))
+		if (InServiceOrders.GetEntry(pServe))
 		{
 			pServe->InjureCook(currentTimeStep);
 			NumInjuredCooks++;
@@ -680,24 +698,24 @@ void Restaurant::ReadFile()
 	srand((int)time(NULL));
 	for (int i = 0; i < NumNormalCooks; i++)
 	{
-		int speed = NormalSpeed[0] + rand() % NormalSpeed[1];
-		int Break = NormalBreak[0] + rand() % NormalBreak[1];
+		int speed = rand() % (NormalSpeed[1] - NormalSpeed[0] + 1) + NormalSpeed[0];
+		int Break = rand() % (NormalBreak[1] - NormalBreak[0] + 1) + NormalBreak[0];
 		Cook* pCook = new Cook(i + 1, TYPE_NRM, speed, Break);
 		NormalCooks.enqueue(pCook);
 	}
 
 	for (int i = 0; i < NumVeganCooks; i++)
 	{
-		int speed = VeganSpeed[0] + rand() % VeganSpeed[1];
-		int Break = VeganBreak[0] + rand() % VeganBreak[1];
+		int speed = rand() % (VeganSpeed[1] - VeganSpeed[0] + 1) + VeganSpeed[0];
+		int Break = rand() % (VeganBreak[1] - VeganBreak[0] + 1) + VeganBreak[0];
 		Cook* pCook = new Cook(i + 1 + NumNormalCooks, TYPE_VGAN, speed, Break);
 		VeganCooks.enqueue(pCook);
 	}
 
 	for (int i = 0; i < NumVipCooks; i++)
 	{
-		int speed = VipSpeed[0] + rand() % VipSpeed[1];
-		int Break = VipBreak[0] + rand() % VipBreak[1];
+		int speed = rand() % (VipSpeed[1] - VipSpeed[0] + 1) + VipSpeed[0];
+		int Break = rand() % (VipBreak[1] - VipBreak[0] + 1) + VipBreak[0];
 		Cook* pCook = new Cook(i + 1 + NumNormalCooks + NumVeganCooks, TYPE_VIP, speed, Break);
 		VipCooks.enqueue(pCook);
 	}
@@ -791,50 +809,3 @@ void Restaurant::PrintFile()
 	OutputFile << "Auto - promoted: " << (float(NumAutoPromoted) / NumNormalOrders) * 100 << " %";
 	OutputFile.close();
 }
-
-/*void Restaurant::simulate()
-{
-	int timestep = 0;
-	int ordernum = 0;
-	ReadFile();
-	pGUI->PrintMessage("Click to continue");
-	while (!InServiceOrders.isempty() || !NormalOrders.isempty()
-		|| !VipOrders.isEmpty() || !VeganOrders.isEmpty() ||
-		!EventsQueue.isEmpty())
-	{
-		pGUI->waitForClick();
-		timestep++;
-		ExecuteEvents(timestep);
-		Order* ptr;
-		if (NormalOrders.dequeue(ptr))
-		{
-			ptr->setStatus(SRV);
-			InServiceOrders.InsertEnd(ptr);
-		}
-		if (VipOrders.dequeue(ptr))
-		{
-			ptr->setStatus(SRV);
-			InServiceOrders.InsertEnd(ptr);
-		}
-		if (VeganOrders.dequeue(ptr))
-		{
-			ptr->setStatus(SRV);
-			InServiceOrders.InsertEnd(ptr);
-		}
-		if (timestep % 5 == 0)
-		{
-			int t = 3;
-			while (t--)
-			{
-				if (!InServiceOrders.dequeue(ptr))
-					break;
-				ptr->setStatus(DONE);
-				FinishedOrders.enqueue(ptr);
-			}
-		}
-		FillDrawingList(timestep);
-	}
-	pGUI->PrintMessage("Simulation ended, click to exit");
-	pGUI->waitForClick();
-}
-*/

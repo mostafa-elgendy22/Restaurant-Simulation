@@ -11,7 +11,6 @@ class BinarySearchTree
 
 	static void rec_insert(T& item, BinaryTreeNode<T>*& subRoot);
 	static BinaryTreeNode<T>* rec_delete(T& item, K key, BinaryTreeNode<T>*& subRoot, bool& isDeleted, bool& entry);
-	static BinaryTreeNode<T>* rec_leaf_delete(T& item, BinaryTreeNode<T>* subRoot, bool& isDeleted);
 	static BinaryTreeNode<T>* FindMin(BinaryTreeNode<T>* subRoot);
 	static int rec_getcount(BinaryTreeNode<T>* root);
 	static void rec_fillarrinorder(BinaryTreeNode<T>* root, T* Arr, int& indx);
@@ -21,7 +20,7 @@ public:
 
 	BinarySearchTree();
 	void Insert(T& item);
-	bool Delete(T& item, K key = -1);
+	bool Delete(T& item, K key);
 	bool isEmpty();
 	bool GetEntry(T& item);
 	T* toArray(int& cnt);
@@ -137,38 +136,13 @@ BinaryTreeNode<T>* BinarySearchTree<T, K>::rec_delete(T& item, K key, BinaryTree
 	}
 }
 
-template<class T, class K>
-BinaryTreeNode<T>* BinarySearchTree<T, K>::rec_leaf_delete(T& item, BinaryTreeNode<T>* subRoot, bool& isDeleted)
-{
-	if (!subRoot)
-	{
-		return nullptr;
-	}
-
-	if (!subRoot->GetLeft() && !subRoot->GetRight() && !isDeleted)
-	{
-		item = subRoot->GetItem();
-		delete subRoot;
-		isDeleted = true;
-		return nullptr;
-	}
-	subRoot->SetLeft(rec_leaf_delete(item, subRoot->GetLeft(), isDeleted));
-	subRoot->SetRight(rec_leaf_delete(item, subRoot->GetRight(), isDeleted));
-}
 
 template<class T, class K>
 bool BinarySearchTree<T, K>::Delete(T& item, K key)
 {
 	bool isDeleted = false;
 	bool entry = false;
-	if (key == -1)
-	{
-		rec_leaf_delete(item, Root, isDeleted);
-	}
-	else
-	{
-		rec_delete(item, key, Root, isDeleted, entry);
-	}
+	rec_delete(item, key, Root, isDeleted, entry);
 	return isDeleted;
 }
 

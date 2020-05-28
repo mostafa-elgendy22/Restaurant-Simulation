@@ -93,9 +93,9 @@ bool Cook::IsInjured()
 	return isInjured;
 }
 
-Cook::operator int()
+bool Cook::operator > (Cook& cook)
 {
-	return (StartBreakTime + BreakDuration);
+	return (StartBreakTime + BreakDuration) < (cook.StartBreakTime + cook.BreakDuration);
 }
 
 void Cook::SetMaxNumOrders(int number)

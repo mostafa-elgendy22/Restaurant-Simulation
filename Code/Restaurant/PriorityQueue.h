@@ -46,7 +46,6 @@ bool PriorityQueue<T>::enqueue(const T& newEntry)
 		return true;
 	}
 
-
 	if (*(newnode->getItem()) > * (Front->getItem()))
 	{
 		newnode->setNext(Front);

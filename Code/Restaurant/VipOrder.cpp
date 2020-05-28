@@ -34,7 +34,7 @@ bool VipOrder::IsUrgent()
 	return isUrgent;
 }
 
-bool VipOrder::operator > (VipOrder ord)
+bool VipOrder::operator > (VipOrder& ord)
 {
 	return PriorityFactor > ord.PriorityFactor;
 }

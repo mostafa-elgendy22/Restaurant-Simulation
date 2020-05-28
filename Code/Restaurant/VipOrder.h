@@ -21,8 +21,7 @@ public:
 
 	bool IsUrgent();
 
-	bool operator > (VipOrder ord);
-
+	bool operator > (VipOrder& ord);
 	operator int();
 };
 
