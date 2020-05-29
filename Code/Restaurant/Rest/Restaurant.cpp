@@ -787,8 +787,7 @@ void Restaurant::PrintFile()
 	float WT_Sum = 0;
 	float ST_Sum = 0;
 	
-	int count = FinishedOrders.GetLength();
-	for (int i = 0; i < count; i++)
+	while(!FinishedOrders.isEmpty())
 	{
 		Order* pOrd;
 		FinishedOrders.peekHead(pOrd);
