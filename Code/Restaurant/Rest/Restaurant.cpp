@@ -786,8 +786,9 @@ void Restaurant::PrintFile()
 	OutputFile << "FT\tID\tAT\tWT\tST\n";
 	float WT_Sum = 0;
 	float ST_Sum = 0;
-
-	for (int i = 0; i < FinishedOrders.GetLength(); i++)
+	
+	int count = FinishedOrders.GetLength();
+	for (int i = 0; i < count; i++)
 	{
 		Order* pOrd;
 		FinishedOrders.peekHead(pOrd);
