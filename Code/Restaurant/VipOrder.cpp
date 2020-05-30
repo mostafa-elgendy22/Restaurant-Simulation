@@ -20,8 +20,13 @@ VipOrder::VipOrder(NormalOrder* ord) :
 void VipOrder::CalculatePriorityFactor()
 {
 	//write priority equation here
+	int money_weight, size_weight, time_weight;
 
-	//PriorityFactor = ;
+	money_weight = 5;
+	size_weight = -5;
+	//time_weight = 10;
+
+	PriorityFactor = money_weight * totalMoney + size_weight * Size;
 }
 
 float VipOrder::GetPriorityFactor()
@@ -33,6 +38,12 @@ bool VipOrder::IsUrgent()
 {
 	return isUrgent;
 }
+
+void VipOrder::Urgent()
+{
+	isUrgent = 1;
+}
+
 
 bool VipOrder::operator > (VipOrder& ord)
 {

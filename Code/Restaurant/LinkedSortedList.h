@@ -68,7 +68,7 @@ void LinkedSortedList<T, K>::Insert(const T& item)
 		return;
 	}
 
-	if (*(Head->getItem()) < *(ptr->getItem()))
+	if (*(ptr->getItem()) > *(Head->getItem()))
 	{
 		ptr->setNext(Head);
 		Head = ptr;
@@ -126,10 +126,14 @@ bool LinkedSortedList<T, K>::Delete(T& item)
 
 	Node<T>* ptr = Head;
 	todelete = Head->getNext();
-	while (ptr)
+	while (todelete)
 	{
-		if (ptr->getItem() == item)
+		if (todelete->getItem() == item)
 		{
+			if (Back== todelete)
+			{
+				Back = ptr;
+			}
 			ptr->setNext(todelete->getNext());
 			delete todelete;
 			todelete = nullptr;
@@ -189,7 +193,7 @@ bool LinkedSortedList<T, K>::GetEntry(T& item, K key)
 	K search_key = *(Back->getItem());
 	if (search_key == key)
 	{
-		item = Head->getItem();
+		item = Back->getItem();
 		return true;
 	}
 	Node<T>* ptr = Head;

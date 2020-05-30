@@ -200,8 +200,10 @@ void Restaurant::ManageOrders(int currentTimeStep)
 		Cook* pCook = FindCookForUrgentOrder(pVip);
 		if (pCook)
 		{
+			pVip->Urgent();
 			OrderService* pServe = new OrderService(pVip, pCook, currentTimeStep);
 			pServe->Serve(this);
+			VipOrders.Delete(pVip);
 			NumUrgentOrders++;
 		}
 		else
@@ -219,7 +221,7 @@ void Restaurant::AssignOrders(int currentTimeStep)
 	VipOrder* pVip;
 	while (VipOrders.peekHead(pVip))
 	{
-		if (pVip->GetAT() >= currentTimeStep)
+		if (pVip->GetAT() <= currentTimeStep)
 		{
 			pCook = FindCook(pVip);
 			if (pCook)
@@ -242,7 +244,7 @@ void Restaurant::AssignOrders(int currentTimeStep)
 	VeganOrder* pVegan;
 	while (VeganOrders.peekFront(pVegan))
 	{
-		if (pVegan->GetAT() >= currentTimeStep)
+		if (pVegan->GetAT() <= currentTimeStep)
 		{
 			pCook = FindCook(pVegan);
 			if (pCook)
@@ -265,7 +267,7 @@ void Restaurant::AssignOrders(int currentTimeStep)
 	NormalOrder* pNorm;
 	while (NormalOrders.peekHead(pNorm))
 	{
-		if (pNorm->GetAT() >= currentTimeStep)
+		if (pNorm->GetAT() <= currentTimeStep)
 		{
 			pCook = FindCook(pNorm);
 			if (pCook)
