@@ -16,7 +16,7 @@ void OrderService::Serve(Restaurant* pRest)
 	ord->SetStatus(SRV);
 	pRest->AddToInserviceList(this);
 	ord->SetST(ServiceTime);
-	ord->SetFT(ServiceTime + ord->GetAT());
+	ord->SetFT(ServiceTime + startTime);
 	if (dynamic_cast<VipOrder*> (ord))
 	{
 		VipOrder* pVip = dynamic_cast<VipOrder*> (ord);
@@ -40,7 +40,7 @@ void OrderService::InjureCook(int currentTimeStep)
 	cook->HalfSpeed();
 	ServiceTime = (currentTimeStep - startTime) + int(ceil(float(remainedDishes) / cook->GetSpeed()));
 	ord->SetST(ServiceTime);
-	ord->SetFT(ServiceTime + ord->GetAT());
+	ord->SetFT(ServiceTime + startTime);
 }
 
 void OrderService::FinishOrder(Restaurant* pRest, int time)

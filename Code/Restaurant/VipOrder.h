@@ -20,6 +20,7 @@ public:
 	float GetPriorityFactor();
 
 	bool IsUrgent();
+	void Urgent();
 
 	bool operator > (VipOrder& ord);
 	operator int();

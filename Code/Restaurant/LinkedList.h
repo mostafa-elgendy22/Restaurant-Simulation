@@ -104,10 +104,15 @@ bool LinkedList<T, K>::Delete(T& item)
 
 	Node<T>* ptr = Head;
 	todelete = Head->getNext();
-	while (ptr)
+	while (todelete)
 	{
-		if (ptr->getItem() == item)
+		if (todelete->getItem() == item)
 		{
+			if (Back == todelete)
+			{
+				Back = ptr;
+			}
+
 			ptr->setNext(todelete->getNext());
 			delete todelete;
 			todelete = nullptr;
