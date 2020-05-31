@@ -184,7 +184,7 @@ void Restaurant::ManageOrders(int currentTimeStep)
 	{
 		if (pNorm->GetAT() + currentTimeStep == NormalOrder::GetAutoPromote())
 		{
-			PromoteOrder(pNorm->GetID());
+			PromoteOrder(pNorm->GetID(), currentTimeStep);
 			NumAutoPromoted++;
 		}
 		else
@@ -650,12 +650,12 @@ void Restaurant::CancelOrder(int ID)
 }
 
 
-void Restaurant::PromoteOrder(int ID)
+void Restaurant::PromoteOrder(int ID, int time)
 {
 	NormalOrder* pOrd = GetNormalOrderFromID(ID);
 	if (pOrd)
 	{
-		VipOrder* order = new VipOrder(pOrd);
+		VipOrder* order = new VipOrder(pOrd, time);
 		NormalOrders.Delete(pOrd);
 		VipOrders.Insert(order);
 		NumNormalOrders--;
@@ -788,8 +788,8 @@ void Restaurant::PrintFile()
 	OutputFile << "FT\tID\tAT\tWT\tST\n";
 	float WT_Sum = 0;
 	float ST_Sum = 0;
-	
-	while(!FinishedOrders.isEmpty())
+
+	while (!FinishedOrders.isEmpty())
 	{
 		Order* pOrd;
 		FinishedOrders.peekHead(pOrd);

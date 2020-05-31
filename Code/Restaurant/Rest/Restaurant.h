@@ -80,7 +80,7 @@ public:
 
 	void CancelOrder(int ID);
 
-	void PromoteOrder(int ID);
+	void PromoteOrder(int ID,int time);
 
 	void FillDrawingList(int currentTimeStep);
 
