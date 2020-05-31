@@ -808,6 +808,8 @@ void Restaurant::PrintFile()
 	OutputFile << ", VIP:" << NumVipCooks << ", injured: " << NumInjuredCooks << "]" << "\n";
 	OutputFile << "Avg Wait = " << "" << ",  Avg Serv = " << "" << "\n";
 	OutputFile << "Urgent orders: " << NumUrgentOrders << ",   ";
-	OutputFile << "Auto - promoted: " << (float(NumAutoPromoted) / NumNormalOrders) * 100 << " %";
+	OutputFile << "Auto - promoted: ";
+	NumNormalOrders == 0 ? OutputFile << 0 : OutputFile << (float(NumAutoPromoted) / NumNormalOrders) * 100;
+	OutputFile << " %";
 	OutputFile.close();
 }
