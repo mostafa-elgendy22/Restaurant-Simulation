@@ -452,7 +452,7 @@ void Restaurant::AddToInserviceList(OrderService* pServe)
 
 void Restaurant::AddToFinishedList(Order* ord)
 {
-	FinishedOrders.InsertEnd(ord);
+	FinishedOrders.Insert(ord);
 }
 
 

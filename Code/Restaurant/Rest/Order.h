@@ -57,6 +57,9 @@ public:
 	void SetST(int time);
 
 	void SetFT(int time);
+
+	bool operator > (Order& ord);
+
 };
 
 #endif

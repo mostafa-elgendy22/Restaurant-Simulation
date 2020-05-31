@@ -54,6 +54,8 @@ int Cook::GetSpeed() const
 void Cook::HalfSpeed()
 {
 	speed = speed / 2;
+	if (!speed)
+		speed = 1;
 }
 
 void Cook::IncrementServicedOrders()

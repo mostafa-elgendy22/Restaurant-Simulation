@@ -75,6 +75,17 @@ double Order::GetMoney()
 	return totalMoney;
 }
 
+bool Order::operator > (Order& ord)
+{
+	if (ord.FinishTime == this->FinishTime)
+	{
+		return (ord.ServTime > this->ServTime);
+	}
+
+	return ord.FinishTime > this->FinishTime;
+
+}
+
 void Order::SetST(int time)
 {
 	ServTime = time;

@@ -29,7 +29,7 @@ private:
 	Queue<VeganOrder*> VeganOrders;
 
 	BinarySearchTree<OrderService*, int>InServiceOrders;
-	LinkedList<Order*, int>FinishedOrders;
+	LinkedSortedList<Order*, int>FinishedOrders;
 
 	Queue<Cook*>NormalCooks;
 	Queue<Cook*>VeganCooks;
