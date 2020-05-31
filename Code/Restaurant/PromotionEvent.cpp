@@ -12,6 +12,6 @@ void PromotionEvent::Execute(Restaurant* pRest)
 	if (pOrd)
 	{
 		pOrd->SetMoney(pOrd->GetMoney() + ExMoney);
-		pRest->PromoteOrder(OrderID);
+		pRest->PromoteOrder(OrderID, EventTime);
 	}
 }

@@ -6,6 +6,7 @@ class VipOrder : public Order
 {
 	float PriorityFactor;
 	bool isUrgent;
+	int PromotionTime;   //to count the time correctly for the promoted normal orders
 	static int Vip_WT;
 
 	void CalculatePriorityFactor();
@@ -13,7 +14,7 @@ class VipOrder : public Order
 public:
 	VipOrder(int ID, int size, int time, double money);
 
-	VipOrder(NormalOrder* ord);
+	VipOrder(NormalOrder* ord,int time);   //conversion constructor for promoted orders
 
 	static void SetVipWT(int time);
 

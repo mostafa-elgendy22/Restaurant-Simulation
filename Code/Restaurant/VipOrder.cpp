@@ -8,13 +8,15 @@ VipOrder::VipOrder(int ID, int size, int time, double money) :
 {
 	CalculatePriorityFactor();
 	isUrgent = false;
+	PromotionTime = ArrTime;
 }
 
-VipOrder::VipOrder(NormalOrder* ord) :
+VipOrder::VipOrder(NormalOrder* ord, int time) :
 	Order(ord->GetID(), TYPE_VIP, ord->GetSize(), ord->GetAT(), ord->GetMoney())
 {
 	CalculatePriorityFactor();
 	isUrgent = false;
+	PromotionTime = time;
 }
 
 void VipOrder::CalculatePriorityFactor()
@@ -52,7 +54,7 @@ bool VipOrder::operator > (VipOrder& ord)
 
 VipOrder::operator int()
 {
-	return ArrTime + Vip_WT;
+	return PromotionTime + Vip_WT;
 }
 
 void VipOrder::SetVipWT(int time)
