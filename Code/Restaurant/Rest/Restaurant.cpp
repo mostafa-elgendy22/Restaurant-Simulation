@@ -806,7 +806,7 @@ void Restaurant::PrintFile()
 	OutputFile << "Cooks: " << NumNormalCooks + NumVipCooks + NumVeganCooks;
 	OutputFile << " [Norm:" << NumNormalCooks << ", Veg:" << NumVeganCooks;
 	OutputFile << ", VIP:" << NumVipCooks << ", injured: " << NumInjuredCooks << "]" << "\n";
-	OutputFile << "Avg Wait = " << "" << ",  Avg Serv = " << "" << "\n";
+	OutputFile << "Avg Wait = " << WT_Sum/(NumNormalOrders + NumVeganOrders + NumVipOrders) << ",  Avg Serv = " << ST_Sum/ (NumNormalOrders + NumVeganOrders + NumVipOrders) << "\n";
 	OutputFile << "Urgent orders: " << NumUrgentOrders << ",   ";
 	OutputFile << "Auto - promoted: ";
 	NumNormalOrders == 0 ? OutputFile << 0 : OutputFile << (float(NumAutoPromoted) / NumNormalOrders) * 100;
