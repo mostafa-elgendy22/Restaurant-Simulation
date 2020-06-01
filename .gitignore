@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/Code/.vs/Restaurant/v16
+/Code/Debug
+/Code/Restaurant/Debug
+/Output Files/123.txt
+/Output Files/45.txt
+/Output Files/222.txt
