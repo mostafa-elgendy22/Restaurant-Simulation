@@ -14,7 +14,7 @@ class VipOrder : public Order
 public:
 	VipOrder(int ID, int size, int time, double money);
 
-	VipOrder(NormalOrder* ord,int time);   //conversion constructor for promoted orders
+	VipOrder(NormalOrder* ord,int time);   //conversion constructor for promoted normal orders
 
 	static void SetVipWT(int time);
 

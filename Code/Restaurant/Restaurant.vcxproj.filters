@@ -129,9 +129,6 @@
     <ClInclude Include="VipOrder.h">
       <Filter>Restaurant</Filter>
     </ClInclude>
-    <ClInclude Include="BinaryTreeNode.h">
-      <Filter>Generic_DS</Filter>
-    </ClInclude>
     <ClInclude Include="OrderService.h">
       <Filter>Restaurant</Filter>
     </ClInclude>

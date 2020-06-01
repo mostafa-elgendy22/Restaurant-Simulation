@@ -170,7 +170,7 @@ void Restaurant::CompleteOrders(int currentTimeStep)
 {
 	OrderService* pServe = nullptr;
 
-	while (InServiceOrders.GetEntry(pServe,currentTimeStep))
+	while (InServiceOrders.GetEntry(pServe, currentTimeStep))
 	{
 		InServiceOrders.Delete(pServe);
 		pServe->FinishOrder(this, currentTimeStep);
@@ -183,7 +183,7 @@ void Restaurant::ManageOrders(int currentTimeStep)
 
 	while (NormalOrders.peekHead(pNorm))
 	{
-		if (pNorm->GetAT() + currentTimeStep == NormalOrder::GetAutoPromote())
+		if (pNorm->GetAT() + NormalOrder::GetAutoPromote() == currentTimeStep)
 		{
 			PromoteOrder(pNorm->GetID(), currentTimeStep);
 			NumAutoPromoted++;
@@ -797,7 +797,7 @@ void Restaurant::PrintFile()
 	OutputFile << "Avg Wait = " << WT_Sum / (NumNormalOrders + NumVeganOrders + NumVipOrders) << ",  Avg Serv = " << ST_Sum / (NumNormalOrders + NumVeganOrders + NumVipOrders) << "\n";
 	OutputFile << "Urgent orders: " << NumUrgentOrders << ",   ";
 	OutputFile << "Auto - promoted: ";
-	NumNormalOrders == 0 ? OutputFile << 0 : OutputFile << (float(NumAutoPromoted) / NumNormalOrders + NumAutoPromoted) * 100;
+	NumNormalOrders == 0 && NumAutoPromoted == 0 ? OutputFile << 0 : OutputFile << (float(NumAutoPromoted) / (NumNormalOrders + NumAutoPromoted)) * 100;
 	OutputFile << " %";
 	OutputFile.close();
 }

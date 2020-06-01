@@ -21,14 +21,13 @@ VipOrder::VipOrder(NormalOrder* ord, int time) :
 
 void VipOrder::CalculatePriorityFactor()
 {
-	//write priority equation here
 	int money_weight, size_weight, time_weight;
 
 	money_weight = 5;
 	size_weight = -5;
-	//time_weight = 10;
+	time_weight = -10;
 
-	PriorityFactor = money_weight * totalMoney + size_weight * Size;
+	PriorityFactor = money_weight * totalMoney + size_weight * Size + time_weight * ArrTime;
 }
 
 float VipOrder::GetPriorityFactor()

@@ -1,6 +1,6 @@
 #include "OrderService.h"
 #include "Rest/Restaurant.h"
-#include <cmath>
+#include <cmath> //to use the ceil function
 
 OrderService::OrderService(Order* o, Cook* c, int time)
 {
