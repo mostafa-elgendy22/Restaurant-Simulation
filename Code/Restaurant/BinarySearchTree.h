@@ -2,7 +2,7 @@
 
 #include "BinaryTreeNode.h"
 
-template<class T, class K = T>
+template<class T, class K>  // K is for searching using a key value
 class BinarySearchTree
 {
 	BinaryTreeNode<T>* Root;

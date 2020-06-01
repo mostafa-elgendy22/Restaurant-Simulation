@@ -193,18 +193,23 @@ void Restaurant::ManageOrders(int currentTimeStep)
 		}
 	}
 
-
 	VipOrder* pVip;
-	while (VipOrders.GetEntry(pVip, currentTimeStep))
+	while (VipOrders.GetEntry(pVip, currentTimeStep)) //getting all the urgent orders in the current time step
+	{
+		NumUrgentOrders++;
+		pVip->Urgent();
+		UrgentOrders.enqueue(pVip);
+		VipOrders.Delete(pVip);
+	}
+
+	while (UrgentOrders.peekFront(pVip)) //serving all the urgent orders
 	{
 		Cook* pCook = FindCookForUrgentOrder(pVip);
 		if (pCook)
 		{
-			pVip->Urgent();
+			UrgentOrders.dequeue(pVip);
 			OrderService* pServe = new OrderService(pVip, pCook, currentTimeStep);
 			pServe->Serve(this);
-			VipOrders.Delete(pVip);
-			NumUrgentOrders++;
 		}
 		else
 		{
@@ -221,19 +226,12 @@ void Restaurant::AssignOrders(int currentTimeStep)
 	VipOrder* pVip;
 	while (VipOrders.peekHead(pVip))
 	{
-		if (pVip->GetAT() <= currentTimeStep)
+		pCook = FindCook(pVip);
+		if (pCook)
 		{
-			pCook = FindCook(pVip);
-			if (pCook)
-			{
-				pServe = new OrderService(pVip, pCook, currentTimeStep);
-				pServe->Serve(this);
-				VipOrders.Delete(pVip);
-			}
-			else
-			{
-				break;
-			}
+			pServe = new OrderService(pVip, pCook, currentTimeStep);
+			pServe->Serve(this);
+			VipOrders.Delete(pVip);
 		}
 		else
 		{
@@ -244,19 +242,12 @@ void Restaurant::AssignOrders(int currentTimeStep)
 	VeganOrder* pVegan;
 	while (VeganOrders.peekFront(pVegan))
 	{
-		if (pVegan->GetAT() <= currentTimeStep)
+		pCook = FindCook(pVegan);
+		if (pCook)
 		{
-			pCook = FindCook(pVegan);
-			if (pCook)
-			{
-				pServe = new OrderService(pVegan, pCook, currentTimeStep);
-				pServe->Serve(this);
-				VeganOrders.dequeue(pVegan);
-			}
-			else
-			{
-				break;
-			}
+			pServe = new OrderService(pVegan, pCook, currentTimeStep);
+			pServe->Serve(this);
+			VeganOrders.dequeue(pVegan);
 		}
 		else
 		{
@@ -267,19 +258,12 @@ void Restaurant::AssignOrders(int currentTimeStep)
 	NormalOrder* pNorm;
 	while (NormalOrders.peekHead(pNorm))
 	{
-		if (pNorm->GetAT() <= currentTimeStep)
+		pCook = FindCook(pNorm);
+		if (pCook)
 		{
-			pCook = FindCook(pNorm);
-			if (pCook)
-			{
-				pServe = new OrderService(pNorm, pCook, currentTimeStep);
-				pServe->Serve(this);
-				NormalOrders.Delete(pNorm);
-			}
-			else
-			{
-				break;
-			}
+			pServe = new OrderService(pNorm, pCook, currentTimeStep);
+			pServe->Serve(this);
+			NormalOrders.Delete(pNorm);
 		}
 		else
 		{
@@ -529,6 +513,7 @@ void Restaurant::AddToVipList(VipOrder* po)
 Cook* Restaurant::FindCook(Order* ord)
 {
 	Cook* AppropiateCook;
+
 	if (dynamic_cast <VipOrder*> (ord))
 	{
 		if (VipCooks.dequeue(AppropiateCook))
@@ -616,6 +601,8 @@ Cook* Restaurant::FindCookForUrgentOrder(VipOrder* pOrd)
 	{
 		return pCook;
 	}
+
+	return nullptr;
 }
 
 void Restaurant::CheckInjuries(int currentTimeStep)
@@ -806,10 +793,10 @@ void Restaurant::PrintFile()
 	OutputFile << "Cooks: " << NumNormalCooks + NumVipCooks + NumVeganCooks;
 	OutputFile << " [Norm:" << NumNormalCooks << ", Veg:" << NumVeganCooks;
 	OutputFile << ", VIP:" << NumVipCooks << ", injured: " << NumInjuredCooks << "]" << "\n";
-	OutputFile << "Avg Wait = " << WT_Sum/(NumNormalOrders + NumVeganOrders + NumVipOrders) << ",  Avg Serv = " << ST_Sum/ (NumNormalOrders + NumVeganOrders + NumVipOrders) << "\n";
+	OutputFile << "Avg Wait = " << WT_Sum / (NumNormalOrders + NumVeganOrders + NumVipOrders) << ",  Avg Serv = " << ST_Sum / (NumNormalOrders + NumVeganOrders + NumVipOrders) << "\n";
 	OutputFile << "Urgent orders: " << NumUrgentOrders << ",   ";
 	OutputFile << "Auto - promoted: ";
-	NumNormalOrders == 0 ? OutputFile << 0 : OutputFile << (float(NumAutoPromoted) / NumNormalOrders) * 100;
+	NumNormalOrders == 0 ? OutputFile << 0 : OutputFile << (float(NumAutoPromoted) / NumNormalOrders + NumAutoPromoted) * 100;
 	OutputFile << " %";
 	OutputFile.close();
 }

@@ -106,6 +106,7 @@ PriorityQueue<T>::~PriorityQueue()
 		Node<T>* temp = Front;
 		Front = Front->getNext();
 		delete temp;
+		temp = nullptr;
 	}
 }
 
@@ -119,12 +120,13 @@ T* PriorityQueue<T>::toArray(int& count)
 		return nullptr;
 	//counting the no. of items in the Queue
 	Node<T>* p = Front;
-	Node<T>* e = p;
-	do
+
+
+	while (p)
 	{
-		count++;
 		p = p->getNext();
-	} while ((p != e));
+		count++;
+	}
 
 
 	T* Arr = new T[count];

@@ -4,7 +4,7 @@
 #include "Generic_DS/Node.h"
 
 
-template <class T, class K = T>    // K is for searching using a key value
+template <class T, class K>    // K is for searching using a key value
 class LinkedList
 {
 private:
@@ -73,12 +73,12 @@ void LinkedList<T, K>::InsertEnd(const T& data)
 template<class T, class K>
 void LinkedList<T, K>::Clear()
 {
-	Node<T>* P = Head;
 	while (Head)
 	{
-		P = Head->getNext();
-		delete Head;
-		Head = P;
+		Node<T>* P = Head;
+		Head = Head->getNext();
+		delete P;
+		P = nullptr;
 	}
 	count = 0;
 	Head = Back = nullptr;
@@ -94,6 +94,10 @@ bool LinkedList<T, K>::Delete(T& item)
 
 	if (Head->getItem() == item)
 	{
+		if (Head == Back)
+		{
+			Back = nullptr;
+		}
 		todelete = Head;
 		Head = Head->getNext();
 		delete todelete;
@@ -172,7 +176,7 @@ bool LinkedList<T, K>::GetEntry(T& item, K key)
 	K search_key = *(Back->getItem());
 	if (search_key == key)
 	{
-		item = Head->getItem();
+		item = Back->getItem();
 		return true;
 	}
 	Node<T>* ptr = Head;

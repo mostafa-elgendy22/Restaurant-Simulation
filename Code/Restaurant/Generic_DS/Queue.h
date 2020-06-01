@@ -85,6 +85,13 @@ bool Queue<T>::peekFront(T& frntEntry) const
 template <typename T>
 Queue<T>::~Queue()
 {
+	while (Front)
+	{
+		Node<T>* temp = Front;
+		Front = Front->getNext();
+		delete temp;
+		temp = nullptr;
+	}
 }
 
 

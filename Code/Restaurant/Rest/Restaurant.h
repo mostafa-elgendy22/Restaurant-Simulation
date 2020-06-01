@@ -24,6 +24,7 @@ private:
 	GUI* pGUI;
 	Queue<Event*> EventsQueue;	   //Queue of all events that will be loaded from the input file
 
+	Queue<VipOrder*> UrgentOrders;
 	LinkedSortedList<VipOrder*, int> VipOrders;
 	LinkedList<NormalOrder*, int> NormalOrders;
 	Queue<VeganOrder*> VeganOrders;

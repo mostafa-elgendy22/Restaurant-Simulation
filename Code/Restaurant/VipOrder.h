@@ -4,7 +4,7 @@
 
 class VipOrder : public Order
 {
-	float PriorityFactor;
+	double PriorityFactor;
 	bool isUrgent;
 	int PromotionTime;   //to count the time correctly for the promoted normal orders
 	static int Vip_WT;

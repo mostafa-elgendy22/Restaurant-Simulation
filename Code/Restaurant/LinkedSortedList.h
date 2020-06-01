@@ -1,7 +1,7 @@
 #pragma once
 #include "Generic_DS/Node.h"
 
-template<class T, class K>
+template<class T, class K>  // K is for searching using a key value
 class LinkedSortedList
 {
 	Node<T>* Head;	//Pointer to the head of the list
@@ -68,7 +68,7 @@ void LinkedSortedList<T, K>::Insert(const T& item)
 		return;
 	}
 
-	if (*(ptr->getItem()) > *(Head->getItem()))
+	if (*(ptr->getItem()) > * (Head->getItem()))
 	{
 		ptr->setNext(Head);
 		Head = ptr;
@@ -90,17 +90,19 @@ void LinkedSortedList<T, K>::Insert(const T& item)
 		prev = current;
 		current = current->getNext();
 	}
+	prev->setNext(ptr);
+	count++;
 }
 
 template<class T, class K>
 void LinkedSortedList<T, K>::Clear()
 {
-	Node<T>* P = Head;
 	while (Head)
 	{
-		P = Head->getNext();
-		delete Head;
-		Head = P;
+		Node<T>* P = Head;
+		Head = Head->getNext();
+		delete P;
+		P = nullptr;
 	}
 	count = 0;
 	Head = Back = nullptr;
@@ -116,6 +118,10 @@ bool LinkedSortedList<T, K>::Delete(T& item)
 
 	if (Head->getItem() == item)
 	{
+		if (Head == Back)
+		{
+			Back = nullptr;
+		}
 		todelete = Head;
 		Head = Head->getNext();
 		delete todelete;
@@ -130,7 +136,7 @@ bool LinkedSortedList<T, K>::Delete(T& item)
 	{
 		if (todelete->getItem() == item)
 		{
-			if (Back== todelete)
+			if (Back == todelete)
 			{
 				Back = ptr;
 			}
