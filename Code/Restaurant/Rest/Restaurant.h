@@ -10,7 +10,6 @@
 #include "../PriorityQueue.h"
 #include "../LinkedList.h"
 #include "../LinkedSortedList.h"
-#include "../BinarySearchTree.h"
 #include "../VipOrder.h"
 #include "../VeganOrder.h"
 #include "../NormalOrder.h"
