@@ -170,8 +170,9 @@ void Restaurant::CompleteOrders(int currentTimeStep)
 {
 	OrderService* pServe = nullptr;
 
-	while (InServiceOrders.Delete(pServe, currentTimeStep))
+	while (InServiceOrders.GetEntry(pServe,currentTimeStep))
 	{
+		InServiceOrders.Delete(pServe);
 		pServe->FinishOrder(this, currentTimeStep);
 	}
 }
@@ -314,8 +315,8 @@ void Restaurant::FillDrawingList(int currentTimeStep)
 		}
 	}
 
-
-	OrderService** arr2 = InServiceOrders.toArray(cnt);
+	cnt = InServiceOrders.GetLength();
+	OrderService** arr2 = InServiceOrders.toArray();
 	for (int i = 0; i < cnt; i++)
 	{
 		Order* pOrder = arr2[i]->GetOrder();
@@ -431,7 +432,7 @@ void Restaurant::FillDrawingList(int currentTimeStep)
 
 void Restaurant::AddToInserviceList(OrderService* pServe)
 {
-	InServiceOrders.Insert(pServe);
+	InServiceOrders.InsertEnd(pServe);
 }
 
 void Restaurant::AddToFinishedList(Order* ord)

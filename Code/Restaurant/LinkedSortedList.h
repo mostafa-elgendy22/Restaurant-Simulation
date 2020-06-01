@@ -91,6 +91,7 @@ void LinkedSortedList<T, K>::Insert(const T& item)
 		current = current->getNext();
 	}
 	prev->setNext(ptr);
+	Back = ptr;
 	count++;
 }
 

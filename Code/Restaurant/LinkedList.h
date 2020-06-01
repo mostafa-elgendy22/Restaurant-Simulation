@@ -26,7 +26,7 @@ public:
 	bool Delete(T& item);
 	bool peekHead(T& frontEntry);
 	T* toArray();
-	bool GetEntry(T& item, K key);
+	bool GetEntry(T& item, K key = -1);
 };
 #endif	
 
@@ -172,23 +172,41 @@ bool LinkedList<T, K>::GetEntry(T& item, K key)
 	{
 		return false;
 	}
-
-	K search_key = *(Back->getItem());
-	if (search_key == key)
+	if (key == -1)
 	{
-		item = Back->getItem();
-		return true;
+		Node<T>* ptr = Head;
+		while (ptr)
+		{
+			bool flag = *(ptr->getItem());
+			if (flag)
+			{
+				item = ptr->getItem();
+				return true;
+			}
+			ptr = ptr->getNext();
+		}
+		return false;
 	}
-	Node<T>* ptr = Head;
-	while (ptr)
+	else
 	{
-		search_key = *(ptr->getItem());
+
+		K search_key = *(Back->getItem());
 		if (search_key == key)
 		{
-			item = ptr->getItem();
+			item = Back->getItem();
 			return true;
 		}
-		ptr = ptr->getNext();
+		Node<T>* ptr = Head;
+		while (ptr)
+		{
+			search_key = *(ptr->getItem());
+			if (search_key == key)
+			{
+				item = ptr->getItem();
+				return true;
+			}
+			ptr = ptr->getNext();
+		}
+		return false;
 	}
-	return false;
 }
