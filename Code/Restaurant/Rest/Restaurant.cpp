@@ -622,7 +622,7 @@ void Restaurant::CheckInjuries(int currentTimeStep)
 	}
 }
 
-NormalOrder*& Restaurant::GetNormalOrderFromID(int ID)
+NormalOrder* Restaurant::GetNormalOrderFromID(int ID)
 {
 	NormalOrder* ord = nullptr;
 	NormalOrders.GetEntry(ord, ID);
@@ -631,7 +631,8 @@ NormalOrder*& Restaurant::GetNormalOrderFromID(int ID)
 
 void Restaurant::CancelOrder(int ID)
 {
-	if (NormalOrders.Delete(GetNormalOrderFromID(ID)))
+	NormalOrder* pOrd = GetNormalOrderFromID(ID);
+	if (NormalOrders.Delete(pOrd))
 	{
 		NumNormalOrders--;
 	}

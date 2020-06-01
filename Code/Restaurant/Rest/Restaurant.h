@@ -76,7 +76,7 @@ public:
 
 	void ExecuteEvents(int TimeStep);	//executes all events at current timestep
 
-	NormalOrder*& GetNormalOrderFromID(int ID);
+	NormalOrder* GetNormalOrderFromID(int ID);
 
 	void CancelOrder(int ID);
 
