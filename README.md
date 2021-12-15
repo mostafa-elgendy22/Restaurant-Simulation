@@ -1,1 +1,1 @@
-A simulation of operation to a real restaurant using various Data Strucutes.
+A simulation of operation of a real restaurant using various Data Strucutes.
